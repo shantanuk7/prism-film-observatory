@@ -1,0 +1,20 @@
+# Node.js
+node_modules/
+dist/
+npm-debug.log
+.env
+.env.local
+
+# Vite / React
+.vite/
+.vercel/
+.cache/
+
+# IDE and OS-specific files
+.DS_Store
+
+# For Visual Studio Code
+.vscode/
+
+# Thumbnails for project files
+thumbs.db
