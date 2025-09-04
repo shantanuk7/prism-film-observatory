@@ -1,5 +1,5 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
-import Navbar from './components/Navbar'
+import Header from './components/Header'
 import Home from './pages/Home'
 import ObserverLogin from './pages/ObserverLogin'
 import ObserverRegister from './pages/ObserverRegister'
@@ -10,7 +10,8 @@ import MovieObservationsPage from './pages/MovieObservationsPage'
 export default function App() {
   return (
     <BrowserRouter>
-      {/* <Navbar /> */}
+      {/* <Header /> */}
+      <Header/>
       <Routes>
         <Route path="/" element={<Home />} />
         {/* Observer Routes */}
@@ -24,4 +25,4 @@ export default function App() {
       </Routes>
     </BrowserRouter>
   )
-}
+}   
