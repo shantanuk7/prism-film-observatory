@@ -30,7 +30,7 @@ export default function Header() {
     e.preventDefault();
     if (searchQuery.trim()) {
       // Navigate to a search results page
-      navigate(`/search?q=${encodeURIComponent(searchQuery)}`);
+      navigate(`/search?query=${encodeURIComponent(searchQuery)}`);
     }
   };
   
@@ -65,7 +65,7 @@ export default function Header() {
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder={searchPlaceholder}
-            className="w-full bg-gray-100 border border-transparent rounded-lg pl-10 pr-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white transition"
+            className="w-full bg-gray-100 border border-transparent rounded-lg pl-10 pr-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-teal-500 focus:bg-white transition"
           />
         </form>
 
@@ -76,7 +76,7 @@ export default function Header() {
                 <div className="relative" ref={menuRef}>
                   <button
                     onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
-                    className="w-9 h-9 bg-indigo-600 text-white rounded-full focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 flex items-center justify-center"
+                    className="w-9 h-9 bg-teal-600 text-white rounded-full focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500 flex items-center justify-center"
                   >
                     <span className="text-sm font-bold">
                       {user.name ? user.name.charAt(0).toUpperCase() : '?'}
@@ -113,7 +113,7 @@ export default function Header() {
                     </button>
                     <button
                       onClick={() => navigate('/observer/register')}
-                      className="px-4 py-2 text-sm font-medium text-white bg-indigo-600 rounded-md hover:bg-indigo-700 transition-colors"
+                      className="px-4 py-2 text-sm font-medium text-white bg-teal-600 rounded-md hover:bg-teal-700 transition-colors"
                     >
                       Sign Up
                     </button>

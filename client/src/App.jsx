@@ -6,6 +6,7 @@ import ObserverRegister from './pages/ObserverRegister'
 import ContributorLogin from './pages/ContributorLogin'
 import ContributorRegister from './pages/ContributorRegister'
 import MovieObservationsPage from './pages/MovieObservationsPage'
+import SearchResultsPage from './pages/SearchResultsPage'
 
 export default function App() {
   return (
@@ -17,8 +18,9 @@ export default function App() {
         {/* Observer Routes */}
         <Route path="/observer/login" element={<ObserverLogin />} />
         <Route path="/observer/register" element={<ObserverRegister />} />
-        <Route path="/observer/movie-posts" element={<MovieObservationsPage />} />
-        
+        <Route path="/observer/movie/:id" element={<MovieObservationsPage />} />
+        <Route path="/search" element={<SearchResultsPage />} />
+
         {/* Contributor Routes */}
         <Route path="/contributor/login" element={<ContributorLogin />} />
         <Route path="/contributor/register" element={<ContributorRegister />} />
