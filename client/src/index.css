@@ -1,4 +1,17 @@
 @import "tailwindcss";
+@custom-variant dark (&:where([data-theme=dark], [data-theme=dark] *));
+
+@layer base {
+  body {
+    /* Default light mode styles */
+    @apply bg-gray-100 text-gray-900 transition-colors duration-300;
+  }
+
+  /* When data-theme="dark" is on the <html> tag, these styles apply to the body */
+  [data-theme="dark"] body {
+    @apply bg-slate-900 text-slate-200;
+  }
+}
 
 * {
   box-sizing: border-box;

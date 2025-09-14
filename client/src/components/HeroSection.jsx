@@ -1,3 +1,4 @@
+
 import { Link } from 'react-router-dom'
 
 export default function HeroSection() {
@@ -24,4 +25,4 @@ export default function HeroSection() {
       </div>
     </div>
   )
-}
+}

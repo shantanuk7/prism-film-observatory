@@ -1,95 +1,166 @@
-import React, { useState, useEffect } from 'react'
-import { useParams } from 'react-router-dom'
-import { useAuth } from '../context/AuthContext'
-import axios from '../api/axios'
+import React, { useState, useCallback, useEffect } from 'react';
+import { useAuth } from '../context/AuthContext';
+import axios from '../api/axios';
+import { Loader2 } from 'lucide-react';
 
-// Modals
-import NewObservationModal from '../components/modals/NewObservationModal'
-import UploadAnalysisModal from '../components/modals/UploadAnalysisModal'
-import ManageScenesModal from '../components/modals/ManageScenesModal'
+// Import Custom Hook
+import { useMovieData } from '../hooks/useMovieData';
 
-// Components
-import ObservationPost from '../components/observations/ObservationPost'
-import AnalysisPost from '../components/observations/AnalysisPost'
-import SceneList from '../components/observations/SceneList'
+// Import Components
+import Header from '../components/Header';
+import SceneListSidebar from '../components/movie-observations/SceneListSidebar';
+import MovieHeader from '../components/movie-observations/MovieHeader';
+import ContentTabs from '../components/movie-observations/ContentTabs';
+import SceneDetail from '../components/movie-observations/SceneDetail';
+import ObservationFeed from '../components/movie-observations/ObservationFeed';
+import AnalysisFeed from '../components/movie-observations/AnalysisFeed';
+
+// Import Modals
+import NewObservationModal from '../components/movie-observations/modals/NewObservationModal';
+import UploadAnalysisModal from '../components/movie-observations/modals/UploadAnalysisModal';
+import ManageScenesModal from '../components/movie-observations/modals/ManageScenesModal';
 
 export default function MovieObservationsPage() {
-  const { movieId } = useParams()
-  const { user } = useAuth()
+    const { user, loading: authLoading, setUser } = useAuth();
+    
+    // All data fetching and state is now handled by our custom hook
+    const {
+        movieId,
+        movieDetails,
+        scenes, setScenes,
+        observations, setObservations,
+        analyses, setAnalyses,
+        loading,
+        error
+    } = useMovieData();
+    
+    // UI State remains in the component
+    const [showObservationModal, setShowObservationModal] = useState(false);
+    const [showAnalysisModal, setShowAnalysisModal] = useState(false);
+    const [showManageScenesModal, setShowManageScenesModal] = useState(false);
+    const [currentPage, setCurrentPage] = useState("observations");
+    const [selectedScene, setSelectedScene] = useState(1);
 
-  const [observations, setObservations] = useState([])
-  const [analyses, setAnalyses] = useState([])
-  const [scenes, setScenes] = useState([])
+    // Correctly use useEffect to update selectedScene when scenes data loads
+    useEffect(() => {
+        if (scenes.length > 0 && !scenes.find(s => s.sceneNumber === selectedScene)) {
+            setSelectedScene(scenes[0].sceneNumber);
+        }
+    }, [scenes]);
 
-  const [showObservationModal, setShowObservationModal] = useState(false)
-  const [showAnalysisModal, setShowAnalysisModal] = useState(false)
-  const [showScenesModal, setShowScenesModal] = useState(false)
+    // Handlers for adding new content
+    const handleObservationAdded = useCallback((newObs) => setObservations(p => [newObs, ...p].sort((a,b) => new Date(b.createdAt) - new Date(a.createdAt))), [setObservations]);
+    const handleAnalysisAdded = useCallback((newAnl) => setAnalyses(p => [newAnl, ...p].sort((a,b) => new Date(b.createdAt) - new Date(a.createdAt))), [setAnalyses]);
+    const handleSceneAdded = useCallback((newScene) => setScenes(p => [...p, newScene].sort((a,b) => a.sceneNumber - b.sceneNumber)), [setScenes]);
 
-  // Fetch data
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const [obsRes, anaRes, scnRes] = await Promise.all([
-          axios.get(`/observations/${movieId}`),
-          axios.get(`/analyses/${movieId}`),
-          axios.get(`/scenes/${movieId}`)
-        ])
-        setObservations(obsRes.data)
-        setAnalyses(anaRes.data)
-        setScenes(scnRes.data)
-      } catch (err) {
-        console.error(err)
-      }
+    // Handlers for likes and bookmarks
+    const handleLikeObservation = async (observationId) => {
+        if (!user) return alert("Please log in to like observations.");
+        try {
+            const { data: updatedObservation } = await axios.put(`/observations/${observationId}/like`);
+            setObservations(observations.map(obs => obs._id === observationId ? updatedObservation : obs));
+        } catch (err) {
+            console.error("Failed to like observation:", err);
+        }
+    };
+
+    const handleBookmarkObservation = async (observationId) => {
+        if (!user) return alert("Please log in to bookmark observations.");
+        try {
+            const { data } = await axios.put(`/auth/bookmarks/${observationId}`);
+            setUser({ ...user, bookmarks: data.bookmarks });
+        } catch (err) {
+            console.error("Failed to bookmark observation:", err);
+        }
+    };
+
+    const handleLikeAnalysis = async (analysisId) => {
+        if (!user) return alert("Please log in to like analyses.");
+        try {
+            const { data: updatedAnalysis } = await axios.put(`/analyses/${analysisId}/like`);
+            setAnalyses(analyses.map(anl => anl._id === analysisId ? updatedAnalysis : anl));
+        } catch (err) {
+            console.error("Failed to like analysis:", err);
+        }
+    };
+
+    const handleBookmarkAnalysis = async (analysisId) => {
+        if (!user) return alert("Please log in to bookmark analyses.");
+        try {
+            const { data } = await axios.put(`/auth/bookmarks/analysis/${analysisId}`);
+            setUser({ ...user, analysisBookmarks: data.analysisBookmarks });
+        } catch (err) {
+            console.error("Failed to bookmark analysis:", err);
+        }
+    };
+    
+    // Derived State
+    const currentSceneData = scenes.find(s => s.sceneNumber === selectedScene) || {};
+    const filteredObservations = observations.filter(obs => obs.sceneId == selectedScene);
+
+    // Loading and Error States
+    if (loading) {
+        return <><Header /><div className="flex justify-center items-center h-screen"><Loader2 className="animate-spin text-teal-600 dark:text-teal-500" size={48} /></div></>;
     }
-    fetchData()
-  }, [movieId])
+    if (error) {
+        return <><Header /><div className="text-center pt-32"><h2 className="text-2xl font-bold text-red-600">An Error Occurred</h2><p className="text-gray-600 dark:text-slate-400 mt-2">{error}</p></div></>;
+    }
 
-  return (
-    <div className="container mx-auto px-6 py-12">
-      <div className="flex justify-between mb-6">
-        <h1 className="text-3xl font-bold">Movie Observations</h1>
-        {user && (
-          <div className="space-x-2">
-            <button onClick={() => setShowObservationModal(true)} className="btn-primary">
-              New Observation
-            </button>
-            <button onClick={() => setShowAnalysisModal(true)} className="btn-primary">
-              Upload Analysis
-            </button>
-            <button onClick={() => setShowScenesModal(true)} className="btn-secondary">
-              Manage Scenes
-            </button>
-          </div>
-        )}
-      </div>
+    // Main Render
+    return (
+        <div className="bg-gray-100 dark:bg-slate-900 min-h-screen transition-colors">
+            <Header />
+            <div className="flex pt-16">
+                <SceneListSidebar
+                    scenes={scenes}
+                    selectedScene={selectedScene}
+                    onSelectScene={setSelectedScene}
+                    user={user}
+                    authLoading={authLoading}
+                    onManageScenesClick={() => setShowManageScenesModal(true)}
+                />
 
-      <h2 className="text-2xl font-semibold mb-4">Observations</h2>
-      {observations.map(obs => (
-        <ObservationPost
-          key={obs.id}
-          observation={obs}
-          onLike={() => {}}
-          onBookmark={() => {}}
-        />
-      ))}
+                <main className="flex-1 lg:ml-80 flex flex-col h-[calc(100vh-4rem)]">
+                    <div className="flex-1 overflow-y-auto p-4 sm:p-8">
+                        <div className="max-w-4xl mx-auto">
+                            <MovieHeader details={movieDetails} />
 
-      <h2 className="text-2xl font-semibold my-4">Analyses</h2>
-      {analyses.map(ana => (
-        <AnalysisPost
-          key={ana.id}
-          analysis={ana}
-          onLike={() => {}}
-          onBookmark={() => {}}
-        />
-      ))}
+                            <ContentTabs
+                                currentPage={currentPage}
+                                onSetPage={setCurrentPage}
+                                user={user}
+                                authLoading={authLoading}
+                                scenesExist={scenes.length > 0}
+                                onNewObservationClick={() => setShowObservationModal(true)}
+                                onUploadAnalysisClick={() => setShowAnalysisModal(true)}
+                            />
 
-      <h2 className="text-2xl font-semibold my-4">Scenes</h2>
-      <SceneList scenes={scenes} />
-
-      {/* Modals */}
-      {showObservationModal && <NewObservationModal onClose={() => setShowObservationModal(false)} onSubmit={() => {}} />}
-      {showAnalysisModal && <UploadAnalysisModal onClose={() => setShowAnalysisModal(false)} onSubmit={() => {}} />}
-      {showScenesModal && <ManageScenesModal onClose={() => setShowScenesModal(false)} scenes={scenes} />}
-    </div>
-  )
-}
+                            {currentPage === "observations" ? (
+                                <>
+                                    <SceneDetail sceneData={currentSceneData} selectedScene={selectedScene}/>
+                                    <ObservationFeed
+                                        observations={filteredObservations}
+                                        user={user}
+                                        onLike={handleLikeObservation}
+                                        onBookmark={handleBookmarkObservation}
+                                    />
+                                </>
+                            ) : (
+                                <AnalysisFeed
+                                    analyses={analyses}
+                                    user={user}
+                                    onLike={handleLikeAnalysis}
+                                    onBookmark={handleBookmarkAnalysis}
+                                />
+                            )}
+                        </div>
+                    </div>
+                </main>
+            </div>
+            
+            <NewObservationModal isOpen={showObservationModal} onClose={() => setShowObservationModal(false)} movieId={movieId} selectedScene={selectedScene} sceneData={currentSceneData} onObservationAdded={handleObservationAdded}/>
+            <UploadAnalysisModal isOpen={showAnalysisModal} onClose={() => setShowAnalysisModal(false)} movieId={movieId} onAnalysisAdded={handleAnalysisAdded}/>
+            <ManageScenesModal isOpen={showManageScenesModal} onClose={() => setShowManageScenesModal(false)} movieId={movieId} scenes={scenes} onSceneAdded={handleSceneAdded}/>
+        </div>
+    );
+}

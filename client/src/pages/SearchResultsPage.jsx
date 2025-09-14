@@ -3,6 +3,7 @@ import { useSearchParams } from 'react-router-dom';
 import axios from '../api/axios';
 import { Loader2 } from 'lucide-react';
 import MovieCard from '../components/MovieCard';
+import Header from '../components/Header';
 
 export default function SearchResultsPage() {
     const [searchParams] = useSearchParams();
@@ -13,7 +14,6 @@ export default function SearchResultsPage() {
     const [error, setError] = useState(null);
 
     useEffect(() => {
-        // Prevent API call if query is empty or just whitespace
         if (!query || !query.trim()) {
             setResults([]);
             setLoading(false);
@@ -34,20 +34,19 @@ export default function SearchResultsPage() {
             }
         };
 
-        // Debounce the search request to avoid excessive API calls
         const searchTimeout = setTimeout(() => {
             fetchResults();
-        }, 300); // 300ms delay
+        }, 300);
 
         return () => clearTimeout(searchTimeout);
 
-    }, [query]); // Re-run effect when the query parameter changes
+    }, [query]);
 
     const renderContent = () => {
         if (loading) {
             return (
                 <div className="flex justify-center items-center h-64">
-                    <Loader2 className="animate-spin text-teal-600" size={48} />
+                    <Loader2 className="animate-spin text-teal-600 dark:text-teal-500" size={48} />
                 </div>
             );
         }
@@ -57,7 +56,7 @@ export default function SearchResultsPage() {
         }
 
         if (results.length === 0) {
-            return <p className="text-center text-gray-500">No results found for "{query}".</p>;
+            return <p className="text-center text-gray-500 dark:text-slate-400">No results found for "{query}".</p>;
         }
 
         return (
@@ -70,15 +69,18 @@ export default function SearchResultsPage() {
     };
 
     return (
-        <div className="bg-white min-h-screen pt-24">
-            <main className="container mx-auto px-6 py-8">
-                {query && (
-                    <h1 className="text-2xl md:text-3xl font-bold text-gray-900 mb-8">
-                        Search Results for: <span className="text-teal-600">"{query}"</span>
-                    </h1>
-                )}
-                {renderContent()}
-            </main>
+        <div>
+            <Header/>
+            <div className="bg-white dark:bg-slate-800 min-h-screen pt-24 transition-colors">
+                <main className="container mx-auto px-6 py-8">
+                    {query && (
+                        <h1 className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-slate-100 mb-8">
+                            Search Results for: <span className="text-teal-600 dark:text-teal-400">"{query}"</span>
+                        </h1>
+                    )}
+                    {renderContent()}
+                </main>
+            </div>
         </div>
     );
 }
