@@ -1,47 +1,47 @@
 import Observation from '../models/Observation.js';
 
-// @desc    Create a new observation
-// @route   POST /api/observations
-// @access  Private
+// @desc    Create a new observation
+// @route   POST /api/observations
+// @access  Private
 export const createObservation = async (req, res) => {
-  try {
-    const { movieId, sceneId, content, timestamp, categories } = req.body;
+  try {
+    const { movieId, sceneId, content, timestamp, categories } = req.body;
 
-    if (!movieId || !sceneId || !content || !categories) {
-      return res.status(400).json({ message: 'Missing required fields' });
-    }
+    if (!movieId || !sceneId || !content || !categories) {
+      return res.status(400).json({ message: 'Missing required fields' });
+    }
 
-    const observation = new Observation({
-      movieId,
-      sceneId,
-      content,
-      timestamp,
-      categories,
-      user: req.user._id, // from 'protect' middleware
-    });
+    const observation = new Observation({
+      movieId,
+      sceneId,
+      content,
+      timestamp,
+      categories,
+      user: req.user._id, // from 'protect' middleware
+    });
 
-    const createdObservation = await observation.save();
-    // Populate user details before sending back
-    await createdObservation.populate('user', 'username');
-    res.status(201).json(createdObservation);
-  } catch (error) {
-    res.status(500).json({ message: `Server Error: ${error.message}` });
-  }
+    const createdObservation = await observation.save();
+    // Populate user details before sending back
+    await createdObservation.populate('user', 'username');
+    res.status(201).json(createdObservation);
+  } catch (error) {
+    res.status(500).json({ message: `Server Error: ${error.message}` });
+  }
 };
 
-// @desc    Get all observations for a movie
-// @route   GET /api/observations/:movieId
-// @access  Public
+// @desc    Get all observations for a movie
+// @route   GET /api/observations/:movieId
+// @access  Public
 export const getObservationsForMovie = async (req, res) => {
-  try {
-    const observations = await Observation.find({ movieId: req.params.movieId })
-      .populate('user', 'username') // Only get username from user doc
-      .sort({ createdAt: -1 }); // Show newest first
+  try {
+    const observations = await Observation.find({ movieId: req.params.movieId })
+      .populate('user', 'username') // Only get username from user doc
+      .sort({ createdAt: -1 }); // Show newest first
 
-    res.json(observations);
-  } catch (error) {
-    res.status(500).json({ message: `Server Error: ${error.message}` });
-  }
+    res.json(observations);
+  } catch (error) {
+    res.status(500).json({ message: `Server Error: ${error.message}` });
+  }
 };
 
 // @desc    Like/Unlike an observation
