@@ -1,4 +1,5 @@
 import Observation from '../models/Observation.js';
+import User from '../models/User.js';
 
 // @desc    Create a new observation
 // @route   POST /api/observations
@@ -68,6 +69,38 @@ export const likeObservation = async (req, res) => {
 
         await observation.save();
         res.json(observation);
+    } catch (error) {
+        res.status(500).json({ message: `Server Error: ${error.message}` });
+    }
+};
+
+// @desc    Bookmark/Unbookmark an observation
+// @route   PUT /api/observations/:id/bookmark
+// @access  Private
+export const toggleBookmark = async (req, res) => {
+    try {
+        const user = await User.findById(req.user._id);
+        const observationId = req.params.id;
+
+        // Check if the observation exists to prevent errors
+        const observation = await Observation.findById(observationId);
+        if (!observation) {
+            return res.status(404).json({ message: 'Observation not found' });
+        }
+
+        // Check if the observation has already been bookmarked
+        const isBookmarked = user.bookmarks.includes(observationId);
+
+        if (isBookmarked) {
+            user.bookmarks = user.bookmarks.filter(
+                (id) => id.toString() !== observationId.toString()
+            );
+        } else {
+            user.bookmarks.push(observationId);
+        }
+
+        await user.save();
+        res.json({ bookmarks: user.bookmarks });
     } catch (error) {
         res.status(500).json({ message: `Server Error: ${error.message}` });
     }

@@ -8,6 +8,7 @@ import movieRoutes from './routes/movieRoutes.js'
 import sceneRoutes from './routes/sceneRoutes.js'
 import observationRoutes from './routes/observationRoutes.js'
 import analysisRoutes from './routes/analysisRoutes.js'
+import userRoutes from './routes/userRoutes.js';
 
 dotenv.config()
 connectDB()
@@ -23,6 +24,7 @@ app.use('/api/movies', movieRoutes)
 app.use('/api/scenes/', sceneRoutes)
 app.use('/api/observations/', observationRoutes)
 app.use('/api/analyses/', analysisRoutes)
+app.use('/api/users', userRoutes);
 
 app.get('/', (req, res) => res.send('API is running'))
 

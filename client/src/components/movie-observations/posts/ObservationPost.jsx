@@ -45,4 +45,4 @@ const ObservationPost = ({ observation, onLike, onBookmark, user }) => {
     );
 };
 
-export default ObservationPost;
+export default ObservationPost;

@@ -31,19 +31,16 @@ export const uploadSceneImages = upload.fields([
 ]);
 
 const analysisStorage = new CloudinaryStorage({
-    cloudinary: cloudinary,
-    params: async (req, file) => {
-        // 1. Create a unique public_id from the original filename (without extension)
-        const fileName = path.parse(file.originalname).name.replace(/\s+/g, '_');
-        const publicId = `${fileName}-${Date.now()}`;
-        
-        return {
-            folder: 'prism_analyses',
-            public_id: publicId,
-            resource_type: 'raw',
-            // NOTE: We have removed the 'flags' parameter completely.
-        };
-    },
+  cloudinary,
+  params: async (req, file) => {
+    return {
+      folder: 'prism_analyses',
+      resource_type: 'raw',
+      format: 'pdf',
+      use_filename: true,
+      unique_filename: true,
+    };
+  },
 });
 
 // Configure a new multer instance for PDF uploads

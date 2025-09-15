@@ -22,13 +22,13 @@ const AnalysisPost = ({ analysis, user, onLike, onBookmark }) => {
         return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
     };
 
-    const cloudName = 'dh2izwsin'; // Your Cloudinary cloud name
-    const downloadUrl = analysis.filePublicId 
-        ? `https://res.cloudinary.com/${cloudName}/raw/upload/${analysis.filePublicId}`
+    const cloudName = import.meta.env.VITE_CLOUDINARY_CLOUD_NAME;
+    const suggestedFilename = `${analysis.title.replace(/\s+/g, '_')}.pdf`;
+    
+    const downloadUrl = analysis.filePublicId
+        ? `https://res.cloudinary.com/${cloudName}/raw/upload/fl_attachment:${suggestedFilename}/${analysis.filePublicId}`
         : '#';
     
-    const suggestedFilename = `${analysis.title.replace(/\s+/g, '_')}.pdf`;
-
     return (
         <div className="bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-lg p-6 mb-4 transition-colors shadow-sm hover:shadow-md">
             <div className="flex items-start gap-4">
@@ -67,4 +67,4 @@ const AnalysisPost = ({ analysis, user, onLike, onBookmark }) => {
     );
 };
 
-export default AnalysisPost;
+export default AnalysisPost;

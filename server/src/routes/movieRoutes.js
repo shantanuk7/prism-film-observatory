@@ -26,7 +26,7 @@ router.get('/search', searchMovies);
 // @desc   Get details for a single movie by its TMDB ID
 // @route  GET /api/movies/:movieId
 // @access Public
-router.get('/:movieId', getMovieDetails); // <-- This is the new route
+router.get('/:movieId', getMovieDetails);
 
 export default router;
 

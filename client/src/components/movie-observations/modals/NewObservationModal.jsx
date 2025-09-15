@@ -7,8 +7,22 @@ const NewObservationModal = ({ isOpen, onClose, movieId, selectedScene, sceneDat
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState('');
 
-  const categories = ["Cinematography", "Animation", "Symbolism", "Visual Storytelling", "Storytelling", "Character Development"];
-
+  const categories = [
+      "Cinematography",
+      "Editing",
+      "Sound & Music",
+      "Symbolism",
+      "Foreshadowing",
+      "Character Arc",
+      "Dialogue",
+      "Pacing",
+      "World-Building",
+      "Costume & Set Design",
+      "Visual Effects",
+      "Performance / Acting",
+      "Other"
+  ];
+  
   const handleCategoryToggle = (category) => {
     setFormData((prev) => ({
       ...prev,
@@ -95,4 +109,4 @@ const NewObservationModal = ({ isOpen, onClose, movieId, selectedScene, sceneDat
   );
 };
 
-export default NewObservationModal;
+export default NewObservationModal;

@@ -1,12 +1,10 @@
-import React, { useState, useCallback, useEffect } from 'react';
+import React, { useMemo, useState, useCallback, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import axios from '../api/axios';
 import { Loader2 } from 'lucide-react';
 
-// Import Custom Hook
 import { useMovieData } from '../hooks/useMovieData';
 
-// Import Components
 import Header from '../components/Header';
 import SceneListSidebar from '../components/movie-observations/SceneListSidebar';
 import MovieHeader from '../components/movie-observations/MovieHeader';
@@ -15,15 +13,29 @@ import SceneDetail from '../components/movie-observations/SceneDetail';
 import ObservationFeed from '../components/movie-observations/ObservationFeed';
 import AnalysisFeed from '../components/movie-observations/AnalysisFeed';
 
-// Import Modals
 import NewObservationModal from '../components/movie-observations/modals/NewObservationModal';
 import UploadAnalysisModal from '../components/movie-observations/modals/UploadAnalysisModal';
 import ManageScenesModal from '../components/movie-observations/modals/ManageScenesModal';
 
 export default function MovieObservationsPage() {
     const { user, loading: authLoading, setUser } = useAuth();
-    
-    // All data fetching and state is now handled by our custom hook
+
+    const observationCategories = [
+        "Cinematography",
+        "Editing",
+        "Sound & Music",
+        "Symbolism",
+        "Foreshadowing",
+        "Character Arc",
+        "Dialogue",
+        "Pacing",
+        "World-Building",
+        "Costume & Set Design",
+        "Visual Effects",
+        "Performance / Acting",
+        "Other"
+    ];
+
     const {
         movieId,
         movieDetails,
@@ -34,12 +46,30 @@ export default function MovieObservationsPage() {
         error
     } = useMovieData();
     
-    // UI State remains in the component
     const [showObservationModal, setShowObservationModal] = useState(false);
     const [showAnalysisModal, setShowAnalysisModal] = useState(false);
     const [showManageScenesModal, setShowManageScenesModal] = useState(false);
     const [currentPage, setCurrentPage] = useState("observations");
     const [selectedScene, setSelectedScene] = useState(1);
+
+    // Observation Categories And Sorting
+    const [observationSort, setObservationSort] = useState('newest');
+    const [activeCategory, setActiveCategory] = useState('All');
+    const [analysisSort, setAnalysisSort] = useState('newest');
+
+    useEffect(() => {
+        // If the user is logged in, log this movie to their history
+        if (user && movieId) {
+            const logView = async () => {
+                try {
+                    axios.post('/users/history', { movieId });
+                } catch (err) {
+                    console.error("Failed to log view history:", err);
+                }
+            };
+            logView();
+        }
+    }, [user, movieId]);
 
     // Correctly use useEffect to update selectedScene when scenes data loads
     useEffect(() => {
@@ -47,6 +77,40 @@ export default function MovieObservationsPage() {
             setSelectedScene(scenes[0].sceneNumber);
         }
     }, [scenes]);
+
+    // Logic to process observations based on filters/sort
+    const processedObservations = useMemo(() => {
+        return observations
+            .filter(obs => obs.sceneId == selectedScene)
+            .filter(obs => {
+                if (activeCategory === 'All') return true;
+                return obs.categories.includes(activeCategory);
+            })
+            .sort((a, b) => {
+                switch (observationSort) {
+                    case 'oldest':
+                        return new Date(a.createdAt) - new Date(b.createdAt);
+                    case 'mostLiked':
+                        return (b.likes?.length || 0) - (a.likes?.length || 0);
+                    case 'newest':
+                    default:
+                        return new Date(b.createdAt) - new Date(a.createdAt);
+                }
+            });
+    }, [observations, selectedScene, activeCategory, observationSort]);
+
+    // Logic to sort analyses 
+    const sortedAnalyses = useMemo(() => {
+        return [...analyses].sort((a, b) => {
+             switch (analysisSort) {
+                case 'oldest':
+                    return new Date(a.createdAt) - new Date(b.createdAt);
+                case 'newest':
+                default:
+                    return new Date(b.createdAt) - new Date(a.createdAt);
+            }
+        });
+    }, [analyses, analysisSort]);
 
     // Handlers for adding new content
     const handleObservationAdded = useCallback((newObs) => setObservations(p => [newObs, ...p].sort((a,b) => new Date(b.createdAt) - new Date(a.createdAt))), [setObservations]);
@@ -67,7 +131,7 @@ export default function MovieObservationsPage() {
     const handleBookmarkObservation = async (observationId) => {
         if (!user) return alert("Please log in to bookmark observations.");
         try {
-            const { data } = await axios.put(`/auth/bookmarks/${observationId}`);
+            const { data } = await axios.put(`/observations/${observationId}/bookmark`); 
             setUser({ ...user, bookmarks: data.bookmarks });
         } catch (err) {
             console.error("Failed to bookmark observation:", err);
@@ -87,7 +151,7 @@ export default function MovieObservationsPage() {
     const handleBookmarkAnalysis = async (analysisId) => {
         if (!user) return alert("Please log in to bookmark analyses.");
         try {
-            const { data } = await axios.put(`/auth/bookmarks/analysis/${analysisId}`);
+            const { data } = await axios.put(`/analyses/${analysisId}/bookmark`);
             setUser({ ...user, analysisBookmarks: data.analysisBookmarks });
         } catch (err) {
             console.error("Failed to bookmark analysis:", err);
@@ -96,7 +160,6 @@ export default function MovieObservationsPage() {
     
     // Derived State
     const currentSceneData = scenes.find(s => s.sceneNumber === selectedScene) || {};
-    const filteredObservations = observations.filter(obs => obs.sceneId == selectedScene);
 
     // Loading and Error States
     if (loading) {
@@ -137,20 +200,27 @@ export default function MovieObservationsPage() {
 
                             {currentPage === "observations" ? (
                                 <>
-                                    <SceneDetail sceneData={currentSceneData} selectedScene={selectedScene}/>
+                                    <SceneDetail sceneData={currentSceneData} selectedScene={selectedScene} movieDetails={movieDetails}/>
                                     <ObservationFeed
-                                        observations={filteredObservations}
+                                        observations={processedObservations}
                                         user={user}
                                         onLike={handleLikeObservation}
                                         onBookmark={handleBookmarkObservation}
+                                        categories={observationCategories}
+                                        activeCategory={activeCategory}
+                                        setActiveCategory={setActiveCategory}
+                                        sort={observationSort}
+                                        setSort={setObservationSort}
                                     />
                                 </>
                             ) : (
                                 <AnalysisFeed
-                                    analyses={analyses}
+                                    analyses={sortedAnalyses}
                                     user={user}
                                     onLike={handleLikeAnalysis}
                                     onBookmark={handleBookmarkAnalysis}
+                                    sort={analysisSort}
+                                    setSort={setAnalysisSort}
                                 />
                             )}
                         </div>
@@ -163,4 +233,4 @@ export default function MovieObservationsPage() {
             <ManageScenesModal isOpen={showManageScenesModal} onClose={() => setShowManageScenesModal(false)} movieId={movieId} scenes={scenes} onSceneAdded={handleSceneAdded}/>
         </div>
     );
-}
+}
