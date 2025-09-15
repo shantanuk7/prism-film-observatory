@@ -5,7 +5,7 @@ import { useAuth } from '../context/AuthContext';
 import ThemeToggle from './ThemeToggle';
 
 // Assumes your logo is in the /public folder
-const prismLogo = '/logo.png'; 
+const prismLogo = '../src/assets/logo.png'; 
 
 export default function Header() {
   const { user, logout, loading } = useAuth();
