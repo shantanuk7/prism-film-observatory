@@ -1,19 +1,28 @@
 import { Navigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
+import { Loader2 } from 'lucide-react';
 
-export default function ProtectedRoute({ children }) {
-  const { user, loading } = useAuth()
-  if (loading) return <p>Loading...</p>
-  if (!user) return <Navigate to="/observer/login" />
-  return children
-}
+export default function ProtectedRoute({ children, role }) {
+  const { user, loading } = useAuth();
 
-// src/pages/Home.jsx
-export default function Home() {
-  return (
-    <div className="flex flex-col items-center justify-center h-[80vh]">
-      <h1 className="text-4xl font-bold mb-6">Prism</h1>
-      <input type="text" placeholder="Search movies..." className="border rounded px-4 py-2 w-96" />
-    </div>
-  )
-}
+  if (loading) {
+    return (
+        <div className="flex justify-center items-center h-screen">
+            {/* The spinner will now use a slightly brighter teal in dark mode for better visibility */}
+            <Loader2 className="animate-spin text-teal-600 dark:text-teal-500" size={48} />
+        </div>
+    );
+  }
+
+  // If not logged in, redirect to the login page.
+  if (!user) {
+    return <Navigate to="/observer/login" />;
+  }
+
+  // If a role is required and the user's role doesn't match, redirect to the home page.
+  if (role && user.role !== role) {
+    return <Navigate to="/" />;
+  }
+  
+  return children;
+}
