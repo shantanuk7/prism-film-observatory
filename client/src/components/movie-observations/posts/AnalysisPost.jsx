@@ -23,10 +23,12 @@ const AnalysisPost = ({ analysis, user, onLike, onBookmark }) => {
     };
 
     const cloudName = import.meta.env.VITE_CLOUDINARY_CLOUD_NAME;
-    const suggestedFilename = `${analysis.title.replace(/\s+/g, '_')}.pdf`;
+
+    const rawFilename = `${analysis.title}_by_${analysis.user?.username || 'User'}`;
+    const safeFilename = rawFilename.replace(/[^a-zA-Z0-9_\-]/g, '_');
     
     const downloadUrl = analysis.filePublicId
-        ? `https://res.cloudinary.com/${cloudName}/raw/upload/fl_attachment:${suggestedFilename}/${analysis.filePublicId}`
+        ? `https://res.cloudinary.com/${cloudName}/raw/upload/fl_attachment:${safeFilename}/${analysis.filePublicId}`
         : '#';
     
     return (
@@ -41,7 +43,7 @@ const AnalysisPost = ({ analysis, user, onLike, onBookmark }) => {
                     <h3 className="font-semibold text-lg text-gray-900 dark:text-slate-100 mb-2">{analysis.title}</h3>
                     <p className="text-gray-700 dark:text-slate-300 mb-4 leading-relaxed">{analysis.description}</p>
                     
-                    <a href={downloadUrl} download={suggestedFilename} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-3 bg-gray-100 dark:bg-slate-700 hover:bg-gray-200 dark:hover:bg-slate-600 transition-colors rounded-lg p-3 border dark:border-slate-600 mb-4 text-sm w-full sm:w-auto">
+                    <a href={downloadUrl} download={safeFilename} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-3 bg-gray-100 dark:bg-slate-700 hover:bg-gray-200 dark:hover:bg-slate-600 transition-colors rounded-lg p-3 border dark:border-slate-600 mb-4 text-sm w-full sm:w-auto">
                         <FileText size={24} className="text-teal-600 flex-shrink-0" />
                         <div className='min-w-0'>
                             <span className="font-medium text-gray-800 dark:text-slate-200 truncate block">{analysis.title}.pdf</span>
