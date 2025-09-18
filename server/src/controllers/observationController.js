@@ -68,6 +68,7 @@ export const likeObservation = async (req, res) => {
         }
 
         await observation.save();
+        await observation.populate('user', 'username');
         res.json(observation);
     } catch (error) {
         res.status(500).json({ message: `Server Error: ${error.message}` });

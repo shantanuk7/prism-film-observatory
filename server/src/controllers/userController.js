@@ -175,3 +175,28 @@ export const deleteUserAccount = async (req, res) => {
          res.status(500).json({ message: `Server Error: ${error.message}` });
     }
 };
+
+export const updateUserAvatar = async (req, res) => {
+    try {
+        if (!req.file) {
+            return res.status(400).json({ message: 'No image file provided.' });
+        }
+
+        const user = await User.findById(req.user._id);
+        if (!user) {
+            return res.status(404).json({ message: 'User not found.' });
+        }
+
+        // The secure URL of the uploaded image is on req.file.path
+        user.avatarUrl = req.file.path;
+        await user.save();
+
+        res.json({
+            message: 'Avatar updated successfully',
+            avatarUrl: user.avatarUrl
+        });
+
+    } catch (error) {
+        res.status(500).json({ message: `Server Error: ${error.message}` });
+    }
+};

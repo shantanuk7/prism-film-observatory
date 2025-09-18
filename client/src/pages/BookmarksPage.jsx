@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import axios from '../api/axios';
 import { Loader2, Bookmark } from 'lucide-react';
 import BookmarkCard from '../components/BookmarkCard'; // <-- Import the new card
+import Header from '../components/Header';
 
 export default function BookmarksPage() {
     const [activeTab, setActiveTab] = useState('observations');
@@ -56,6 +57,8 @@ export default function BookmarksPage() {
 
     return (
         <div>
+            <Header/>
+
             <div className="flex items-center gap-3 mb-6 pb-5 border-b border-gray-200 dark:border-slate-700">
                 <Bookmark className="text-teal-600 dark:text-teal-400" size={28} />
                 <h1 className="text-2xl font-bold text-gray-900 dark:text-slate-100">My Bookmarks</h1>
