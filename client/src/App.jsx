@@ -9,7 +9,7 @@ import ContributorLogin from './pages/ContributorLogin';
 import ContributorRegister from './pages/ContributorRegister';
 import MovieObservationsPage from './pages/MovieObservationsPage';
 import SearchResultsPage from './pages/SearchResultsPage';
-import ContributorDashboard from './pages/ContributorDashboard';
+import AdminDashboard from './pages/AdminDashboard';
 import BookmarksPage from './pages/BookmarksPage';
 import ViewingHistoryPage from './pages/ViewingHistoryPage';
 import SettingsPage from './pages/SettingsPage';
@@ -35,16 +35,15 @@ export default function App() {
         <Route path="/history" element={<ProtectedRoute><ViewingHistoryPage /></ProtectedRoute>} />
         <Route path="/settings" element={<ProtectedRoute><SettingsPage /></ProtectedRoute>} />
 
-        {/* Contributor Protected Route */}
+        {/* -- Admin Protected Route -- */}
         <Route 
-          path="/contributor/dashboard" 
+          path="/admin/dashboard"
           element={
-            <ProtectedRoute role="contributor">
-              <ContributorDashboard />
+            <ProtectedRoute role="admin">
+              <AdminDashboard />
             </ProtectedRoute>
-          } 
+          }
         />
-
       </Routes>
     </BrowserRouter>
   )

@@ -16,6 +16,7 @@ import AnalysisFeed from '../components/movie-observations/AnalysisFeed';
 import NewObservationModal from '../components/movie-observations/modals/NewObservationModal';
 import UploadAnalysisModal from '../components/movie-observations/modals/UploadAnalysisModal';
 import ManageScenesModal from '../components/movie-observations/modals/ManageScenesModal';
+import SuggestionModal from '../components/movie-observations/modals/SuggestionModal';
 
 export default function MovieObservationsPage() {
     const { user, loading: authLoading, setUser } = useAuth();
@@ -117,6 +118,14 @@ export default function MovieObservationsPage() {
     const handleAnalysisAdded = useCallback((newAnl) => setAnalyses(p => [newAnl, ...p].sort((a,b) => new Date(b.createdAt) - new Date(a.createdAt))), [setAnalyses]);
     const handleSceneAdded = useCallback((newScene) => setScenes(p => [...p, newScene].sort((a,b) => a.sceneNumber - b.sceneNumber)), [setScenes]);
 
+    const [showSuggestionModal, setShowSuggestionModal] = useState(false);
+    const [suggestionType, setSuggestionType] = useState('NEW_SCENE');
+
+    const handleSuggestEdit = (type) => {
+        setSuggestionType(type);
+        setShowSuggestionModal(true);
+    };
+
     // Handlers for likes and bookmarks
     const handleLikeObservation = async (observationId) => {
         if (!user) return alert("Please log in to like observations.");
@@ -180,7 +189,8 @@ export default function MovieObservationsPage() {
                     onSelectScene={setSelectedScene}
                     user={user}
                     authLoading={authLoading}
-                    onManageScenesClick={() => setShowManageScenesModal(true)}
+                    // This logic is now correct: Admins manage, Observers suggest
+                    onManageScenesClick={() => user?.role === 'admin' ? setShowManageScenesModal(true) : handleSuggestEdit('NEW_SCENE')}
                 />
 
                 <main className="flex-1 lg:ml-80 flex flex-col h-[calc(100vh-4rem)]">
@@ -200,7 +210,12 @@ export default function MovieObservationsPage() {
 
                             {currentPage === "observations" ? (
                                 <>
-                                    <SceneDetail sceneData={currentSceneData} selectedScene={selectedScene} movieDetails={movieDetails}/>
+                                    <SceneDetail 
+                                        sceneData={currentSceneData} 
+                                        selectedScene={selectedScene} 
+                                        movieDetails={movieDetails}
+                                        onSuggestEdit={handleSuggestEdit}
+                                    />
                                     <ObservationFeed
                                         observations={processedObservations}
                                         user={user}
@@ -228,9 +243,46 @@ export default function MovieObservationsPage() {
                 </main>
             </div>
             
-            <NewObservationModal isOpen={showObservationModal} onClose={() => setShowObservationModal(false)} movieId={movieId} selectedScene={selectedScene} sceneData={currentSceneData} onObservationAdded={handleObservationAdded}/>
-            <UploadAnalysisModal isOpen={showAnalysisModal} onClose={() => setShowAnalysisModal(false)} movieId={movieId} onAnalysisAdded={handleAnalysisAdded}/>
-            <ManageScenesModal isOpen={showManageScenesModal} onClose={() => setShowManageScenesModal(false)} movieId={movieId} scenes={scenes} onSceneAdded={handleSceneAdded}/>
+            {/* --- CORRECTED MODAL LOGIC --- */}
+
+            {/* Any logged-in user can access these modals */}
+            {user && (
+                <>
+                    <NewObservationModal 
+                        isOpen={showObservationModal} 
+                        onClose={() => setShowObservationModal(false)} 
+                        movieId={movieId} 
+                        selectedScene={selectedScene} 
+                        sceneData={currentSceneData} 
+                        onObservationAdded={handleObservationAdded}
+                    />
+                    <UploadAnalysisModal 
+                        isOpen={showAnalysisModal} 
+                        onClose={() => setShowAnalysisModal(false)} 
+                        movieId={movieId} 
+                        onAnalysisAdded={handleAnalysisAdded}
+                    />
+                    <SuggestionModal 
+                        isOpen={showSuggestionModal}
+                        onClose={() => setShowSuggestionModal(false)}
+                        movieId={movieId}
+                        suggestionType={suggestionType}
+                        sceneToEdit={currentSceneData}
+                        scenes={scenes}
+                    />
+                </>
+            )}
+
+            {/* Only Admins can access the direct Scene Management Modal */}
+            {user?.role === 'admin' && (
+                <ManageScenesModal 
+                    isOpen={showManageScenesModal} 
+                    onClose={() => setShowManageScenesModal(false)} 
+                    movieId={movieId} 
+                    scenes={scenes} 
+                    onSceneAdded={handleSceneAdded}
+                />
+            )}
         </div>
     );
 }
