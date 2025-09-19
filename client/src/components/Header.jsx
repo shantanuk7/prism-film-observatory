@@ -63,7 +63,6 @@ export default function Header() {
             <>
               {user ? (
                 <>
-                  {/* -- START: New Navigation Links -- */}
                   <nav className="hidden md:flex items-center gap-2">
                     <NavLink to="/bookmarks" className={({ isActive }) => `${navLinkClasses} ${isActive ? activeNavLinkClasses : ''}`}>
                         <Bookmark size={16} /> Bookmarks
@@ -72,7 +71,6 @@ export default function Header() {
                         <History size={16} /> History
                     </NavLink>
                   </nav>
-                  {/* -- END: New Navigation Links -- */}
                   
                   <ThemeToggle />
                   <div className="relative" ref={menuRef}>
@@ -86,6 +84,11 @@ export default function Header() {
                           <p className="text-xs text-gray-500 dark:text-slate-400 truncate">{user.email}</p>
                         </div>
                         <div className="py-1">
+                          {user.role === 'admin' && (
+                            <Link to="/admin/dashboard" onClick={() => setIsUserMenuOpen(false)} className="block w-full text-left px-3 py-2 text-sm font-medium text-teal-600 dark:text-teal-400 hover:bg-gray-100 dark:hover:bg-slate-700 transition-colors">
+                                Admin Dashboard
+                            </Link>
+                          )}
                           <Link to="/settings" onClick={() => setIsUserMenuOpen(false)} className="block w-full text-left px-3 py-2 text-sm text-gray-700 dark:text-slate-300 hover:bg-gray-100 dark:hover:bg-slate-700 transition-colors">Settings</Link>
                           {/* Add links for mobile view */}
                           <Link to="/bookmarks" onClick={() => setIsUserMenuOpen(false)} className="md:hidden block w-full text-left px-3 py-2 text-sm text-gray-700 dark:text-slate-300 hover:bg-gray-100 dark:hover:bg-slate-700 transition-colors">Bookmarks</Link>

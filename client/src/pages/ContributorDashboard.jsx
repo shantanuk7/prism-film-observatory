@@ -5,7 +5,7 @@ export default function ContributorDashboard() {
     <div className="pt-24 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
       <div className="pb-5 border-b border-gray-200 dark:border-slate-700">
         <h1 className="text-3xl font-bold text-gray-900 dark:text-slate-100">
-          Contributor Dashboard
+          Admin Dashboard
         </h1>
         <p className="mt-2 text-sm text-gray-500 dark:text-slate-400">
           Welcome! Here you can add new movies to our database or manage scenes for existing ones.
@@ -25,4 +25,4 @@ export default function ContributorDashboard() {
       </div>
     </div>
   );
-}
+}

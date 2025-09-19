@@ -5,11 +5,11 @@ import ProtectedRoute from './components/ProtectedRoute';
 import Home from './pages/Home';
 import ObserverLogin from './pages/ObserverLogin';
 import ObserverRegister from './pages/ObserverRegister';
-import ContributorLogin from './pages/ContributorLogin';
-import ContributorRegister from './pages/ContributorRegister';
+import AdminLogin from './pages/AdminLogin';
+import AdminRegister from './pages/AdminRegister';
 import MovieObservationsPage from './pages/MovieObservationsPage';
 import SearchResultsPage from './pages/SearchResultsPage';
-import ContributorDashboard from './pages/ContributorDashboard';
+import AdminDashboard from './pages/AdminDashboard';
 import BookmarksPage from './pages/BookmarksPage';
 import ViewingHistoryPage from './pages/ViewingHistoryPage';
 import SettingsPage from './pages/SettingsPage';
@@ -27,24 +27,23 @@ export default function App() {
         {/* Auth Routes */}
         <Route path="/observer/login" element={<ObserverLogin />} />
         <Route path="/observer/register" element={<ObserverRegister />} />
-        <Route path="/contributor/login" element={<ContributorLogin />} />
-        <Route path="/contributor/register" element={<ContributorRegister />} />
+        <Route path="/admin/login" element={<AdminLogin />} />
+        <Route path="/admin/register" element={<AdminRegister />} />
 
         {/* -- Observer Protected Route -- */}
         <Route path="/bookmarks" element={<ProtectedRoute><BookmarksPage /></ProtectedRoute>} />
         <Route path="/history" element={<ProtectedRoute><ViewingHistoryPage /></ProtectedRoute>} />
         <Route path="/settings" element={<ProtectedRoute><SettingsPage /></ProtectedRoute>} />
 
-        {/* Contributor Protected Route */}
+        {/* -- Admin Protected Route -- */}
         <Route 
-          path="/contributor/dashboard" 
+          path="/admin/dashboard"
           element={
-            <ProtectedRoute role="contributor">
-              <ContributorDashboard />
+            <ProtectedRoute role="admin">
+              <AdminDashboard />
             </ProtectedRoute>
-          } 
+          }
         />
-
       </Routes>
     </BrowserRouter>
   )
