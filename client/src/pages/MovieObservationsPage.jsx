@@ -41,6 +41,7 @@ export default function MovieObservationsPage() {
         movieId,
         movieDetails,
         scenes, setScenes,
+        fetchAllData: refetchAllData,
         observations, setObservations,
         analyses, setAnalyses,
         loading,
@@ -178,6 +179,19 @@ export default function MovieObservationsPage() {
         setShowManageScenesModal(false);
         setEditingScene(null); // Clear the editing scene when modal closes
     };
+
+    const handleDeleteScene = async () => {
+        if (window.confirm(`Are you sure you want to delete Scene ${currentSceneData.sceneNumber}? This will also delete all of its observations.`)) {
+            try {
+                await axios.delete(`/scenes/${currentSceneData._id}`);
+                // Refetch all movie data to ensure the UI is up-to-date
+                refetchAllData(); 
+            } catch (error) {
+                console.error("Failed to delete scene:", error);
+                alert("Could not delete the scene. Please try again.");
+            }
+        }
+    };
     
     // Derived State
     const currentSceneData = scenes.find(s => s.sceneNumber === selectedScene) || {};
@@ -201,7 +215,11 @@ export default function MovieObservationsPage() {
                     onSelectScene={setSelectedScene}
                     user={user}
                     authLoading={authLoading}
-                    onManageScenesClick={() => user?.role === 'admin' ? setShowManageScenesModal(true) : handleSuggestEdit('NEW_SCENE')}
+                    onManageScenesClick={() => {
+                        setEditingScene(null); // Ensure it's in "create" mode
+                        setShowManageScenesModal(true);
+                    }}
+                    onSuggestNewSceneClick={() => handleSuggestEdit('NEW_SCENE')}
                 />
 
                 <main className="flex-1 lg:ml-80 flex flex-col h-[calc(100vh-4rem)]">
@@ -227,6 +245,7 @@ export default function MovieObservationsPage() {
                                         movieDetails={movieDetails}
                                         onSuggestEdit={handleSuggestEdit}
                                         onEditScene={handleEditSceneClick}
+                                        onDeleteScene={handleDeleteScene}
                                     />
                                     <ObservationFeed
                                         observations={processedObservations}

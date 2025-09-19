@@ -1,5 +1,6 @@
 import Scene from '../models/Scene.js';
 import Movie from '../models/Movie.js';
+import Observation from '../models/Observation.js';
 
 export const createScene = async (req, res) => {
     const {
@@ -97,6 +98,33 @@ export const updateScene = async (req, res) => {
 
         const updatedScene = await scene.save();
         res.json(updatedScene);
+
+    } catch (error) {
+        res.status(500).json({ message: `Server Error: ${error.message}` });
+    }
+};
+
+// @desc    Delete a scene
+// @route   DELETE /api/scenes/:id
+// @access  Private (Admin)
+export const deleteScene = async (req, res) => {
+    try {
+        const scene = await Scene.findById(req.params.id);
+
+        if (!scene) {
+            return res.status(404).json({ message: 'Scene not found.' });
+        }
+
+        // Before deleting the scene, delete all observations associated with it
+        await Observation.deleteMany({ 
+            movieId: scene.movieId, 
+            sceneId: scene.sceneNumber 
+        });
+        
+        // Now, delete the scene itself
+        await scene.deleteOne();
+
+        res.json({ message: 'Scene and associated observations deleted successfully.' });
 
     } catch (error) {
         res.status(500).json({ message: `Server Error: ${error.message}` });

@@ -1,7 +1,7 @@
 import express from 'express';
-import { createScene, getScenesForMovie, updateScene } from '../controllers/sceneController.js';
+import { createScene, getScenesForMovie, updateScene, deleteScene } from '../controllers/sceneController.js'; 
 import { protect } from '../middleware/authMiddleware.js';
-import { uploadSceneImages } from '../middleware/uploadMiddleware.js';
+import { uploadSceneImages } from '../middleware/uploadMiddleware.js';  
 
 const router = express.Router();
 
@@ -21,6 +21,7 @@ router.route('/:movieId')
   .get(getScenesForMovie);
 
 router.route('/:id')
-  .put(protect, isAdmin, uploadSceneImages, updateScene);
+  .put(protect, isAdmin, uploadSceneImages, updateScene)
+  .delete(protect, isAdmin, deleteScene);
 
 export default router;

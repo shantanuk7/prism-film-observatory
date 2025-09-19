@@ -1,5 +1,5 @@
 import React from 'react';
-import { Plus, Settings } from 'lucide-react';
+import { Plus, GitPullRequestCreate } from 'lucide-react';
 
 const SceneListSidebar = ({ scenes, selectedScene, onSelectScene, user, authLoading, onManageScenesClick }) => {
     return (
@@ -29,14 +29,17 @@ const SceneListSidebar = ({ scenes, selectedScene, onSelectScene, user, authLoad
                 )}
             </nav>
             <div className="p-4 border-t border-gray-200 dark:border-slate-800 space-y-2">
-                {!authLoading && user?.role === 'Admin' && (
-                    <button onClick={onManageScenesClick} className="w-full flex items-center justify-center gap-2 px-3 py-2 text-sm font-medium text-white bg-teal-600 hover:bg-teal-700 rounded-md transition-colors">
-                        <Plus size={16} /> Manage Scenes
-                    </button>
+                {!authLoading && user && (
+                    user.role === 'admin' ? (
+                        <button onClick={onManageScenesClick} className="w-full flex items-center justify-center gap-2 px-3 py-2 text-sm font-medium text-white bg-teal-600 hover:bg-teal-700 rounded-md transition-colors">
+                            <Plus size={16} /> Manage Scenes
+                        </button>
+                    ) : (
+                        <button onClick={onSuggestNewSceneClick} className="w-full flex items-center justify-center gap-2 px-3 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-md transition-colors">
+                            <GitPullRequestCreate size={16} /> Suggest New Scene
+                        </button>
+                    )
                 )}
-                <a href="#" className="w-full flex items-center gap-3 px-3 py-2 text-sm font-medium text-gray-600 dark:text-slate-300 hover:bg-gray-100 dark:hover:bg-slate-800 rounded-md transition-colors">
-                    <Settings size={16} /> Settings
-                </a>
             </div>
         </aside>
     );
