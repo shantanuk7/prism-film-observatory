@@ -17,15 +17,6 @@ const SceneDetail = ({ sceneData, selectedScene, movieDetails, onSuggestEdit, on
         setTimeout(() => setCopied(false), 2000);
     };
 
-    if (!sceneData || !sceneData.description) {
-        return (
-            <div className="text-center text-gray-500 dark:text-slate-400 py-12">
-                <p>No scenes have been added for this movie yet.</p>
-                {user && <button onClick={() => onSuggestEdit('NEW_SCENE')} className="mt-4 px-4 py-2 text-sm font-medium text-white bg-teal-600 rounded-md hover:bg-teal-700">Be the first to add one!</button>}
-            </div>
-        );
-    }
-
     return (
         <div className="bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-lg p-6 mb-6 transition-colors">
             <div className="flex justify-between items-start mb-2 gap-4">

@@ -238,27 +238,42 @@ export default function MovieObservationsPage() {
                             />
 
                             {currentPage === "observations" ? (
-                                <>
-                                    <SceneDetail 
-                                        sceneData={currentSceneData} 
-                                        selectedScene={selectedScene} 
-                                        movieDetails={movieDetails}
-                                        onSuggestEdit={handleSuggestEdit}
-                                        onEditScene={handleEditSceneClick}
-                                        onDeleteScene={handleDeleteScene}
-                                    />
-                                    <ObservationFeed
-                                        observations={processedObservations}
-                                        user={user}
-                                        onLike={handleLikeObservation}
-                                        onBookmark={handleBookmarkObservation}
-                                        categories={observationCategories}
-                                        activeCategory={activeCategory}
-                                        setActiveCategory={setActiveCategory}
-                                        sort={observationSort}
-                                        setSort={setObservationSort}
-                                    />
-                                </>
+                                scenes.length > 0 ? (
+                                    <>
+                                        <SceneDetail 
+                                            sceneData={currentSceneData} 
+                                            selectedScene={selectedScene} 
+                                            movieDetails={movieDetails}
+                                            onSuggestEdit={handleSuggestEdit}
+                                            onEditScene={handleEditSceneClick}
+                                            onDeleteScene={handleDeleteScene}
+                                        />
+                                        <ObservationFeed
+                                            observations={processedObservations}
+                                            user={user}
+                                            onLike={handleLikeObservation}
+                                            onBookmark={handleBookmarkObservation}
+                                            categories={observationCategories}
+                                            activeCategory={activeCategory}
+                                            setActiveCategory={setActiveCategory}
+                                            sort={observationSort}
+                                            setSort={setObservationSort}
+                                        />
+                                    </>
+                                ) : (
+                                    // If no scenes exist, show this single message
+                                    <div className="text-center text-gray-500 dark:text-slate-400 py-12">
+                                        <p className="mb-4">No scenes have been added for this movie yet.</p>
+                                        {user && (
+                                            <button 
+                                                onClick={() => handleSuggestEdit('NEW_SCENE')} 
+                                                className="px-4 py-2 text-sm font-medium text-white bg-teal-600 rounded-md hover:bg-teal-700"
+                                            >
+                                                Be the first to add one!
+                                            </button>
+                                        )}
+                                    </div>
+                                )
                             ) : (
                                 <AnalysisFeed
                                     analyses={sortedAnalyses}
