@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import axios from '../api/axios';
 import { Loader2, History } from 'lucide-react';
 import MovieCard from '../components/MovieCard';
+import UserPageLayout from '../components/UserPageLayout';
 
 export default function ViewingHistoryPage() {
     const [history, setHistory] = useState([]);
@@ -41,12 +42,8 @@ export default function ViewingHistoryPage() {
     };
 
     return (
-        <div>
-            <div className="flex items-center gap-3 mb-6 pb-5 border-b border-gray-200 dark:border-slate-700">
-                <History className="text-teal-600 dark:text-teal-400" size={28} />
-                <h1 className="text-2xl font-bold text-gray-900 dark:text-slate-100">Viewing History</h1>
-            </div>
+        <UserPageLayout title="Viewing History" icon={History}>
             {renderContent()}
-        </div>
+        </UserPageLayout>
     );
 }

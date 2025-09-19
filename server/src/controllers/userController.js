@@ -1,3 +1,5 @@
+// server/src/controllers/userController.js
+
 import User from '../models/User.js';
 import axios from 'axios';
 import bcrypt from 'bcryptjs';
@@ -10,31 +12,27 @@ const TMDB_API_KEY = process.env.TMDB_API_KEY;
 // @route   POST /api/users/history
 // @access  Private
 export const logViewHistory = async (req, res) => {
-  try {
-    const { movieId } = req.body;
-    const user = await User.findById(req.user._id);
+    try {
+        const { movieId } = req.body;
+        const user = await User.findById(req.user._id);
 
-    if (!user) {
-      return res.status(404).json({ message: 'User not found' });
+        if (!user) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+
+        user.viewHistory = user.viewHistory.filter(item => item.movieId !== movieId);
+        user.viewHistory.unshift({ movieId });
+
+        if (user.viewHistory.length > 20) {
+            user.viewHistory = user.viewHistory.slice(0, 20);
+        }
+
+        await user.save();
+        res.status(200).json({ message: 'View history updated' });
+
+    } catch (error) {
+        res.status(500).json({ message: `Server Error: ${error.message}` });
     }
-
-    // Remove any existing entry for this movie to move it to the front
-    user.viewHistory = user.viewHistory.filter(item => item.movieId !== movieId);
-
-    // Add the new entry to the beginning of the array
-    user.viewHistory.unshift({ movieId });
-
-    // Limit the history to the 20 most recent movies
-    if (user.viewHistory.length > 20) {
-      user.viewHistory = user.viewHistory.slice(0, 20);
-    }
-
-    await user.save();
-    res.status(200).json({ message: 'View history updated' });
-
-  } catch (error) {
-    res.status(500).json({ message: `Server Error: ${error.message}` });
-  }
 };
 
 // @desc    Get the user's view history with movie details
@@ -48,16 +46,21 @@ export const getViewHistory = async (req, res) => {
             return res.json([]);
         }
 
-        // Fetch details for each movie from TMDB
         const movieDetailsPromises = user.viewHistory.map(item =>
             axios.get(`https://api.themoviedb.org/3/movie/${item.movieId}?api_key=${TMDB_API_KEY}&language=en-US`)
         );
-        
-        const movieDetailsResponses = await Promise.all(movieDetailsPromises);
-        const movies = movieDetailsResponses.map(response => response.data);
-        
+
+        // *** FIX: Use Promise.allSettled to handle potential errors ***
+        const results = await Promise.allSettled(movieDetailsPromises);
+
+        const movies = results
+            .filter(result => result.status === 'fulfilled') // Keep only successful requests
+            .map(result => result.value.data); // Extract the movie data
+
         res.json(movies);
+
     } catch (error) {
+        console.error("Error in getViewHistory:", error.message);
         res.status(500).json({ message: `Server Error: ${error.message}` });
     }
 };
@@ -75,28 +78,29 @@ export const getBookmarks = async (req, res) => {
             return res.status(404).json({ message: 'User not found' });
         }
 
-        // 1. Get all unique movie IDs from both bookmark types
         const observationMovieIds = user.bookmarks.map(b => b.movieId);
         const analysisMovieIds = user.analysisBookmarks.map(b => b.movieId);
         const allMovieIds = [...new Set([...observationMovieIds, ...analysisMovieIds])];
 
-        // 2. Fetch all required movie details from TMDB in parallel
         const movieDetailsPromises = allMovieIds.map(id =>
             axios.get(`https://api.themoviedb.org/3/movie/${id}?api_key=${TMDB_API_KEY}&language=en-US`)
         );
-        const movieDetailsResponses = await Promise.all(movieDetailsPromises);
         
-        // 3. Create a simple map for easy lookup on the frontend
-        const movieDetailsMap = movieDetailsResponses.reduce((acc, response) => {
-            acc[response.data.id] = {
-                title: response.data.title,
-                poster_path: response.data.poster_path,
-                release_date: response.data.release_date
-            };
-            return acc;
-        }, {});
+        // *** FIX: Use Promise.allSettled here as well for robustness ***
+        const movieDetailsResults = await Promise.allSettled(movieDetailsPromises);
         
-        // 4. Populate the author's username for each bookmark
+        const movieDetailsMap = movieDetailsResults
+            .filter(result => result.status === 'fulfilled')
+            .reduce((acc, result) => {
+                const movieData = result.value.data;
+                acc[movieData.id] = {
+                    title: movieData.title,
+                    poster_path: movieData.poster_path,
+                    release_date: movieData.release_date
+                };
+                return acc;
+            }, {});
+
         const populatedBookmarks = await Observation.populate(user.bookmarks, { path: 'user', select: 'username' });
         const populatedAnalysisBookmarks = await Analysis.populate(user.analysisBookmarks, { path: 'user', select: 'username' });
 
@@ -110,8 +114,7 @@ export const getBookmarks = async (req, res) => {
     }
 };
 
-
-// @desc    Update user profile (username, email)
+// @desc    Update user profile (username, email, avatar)
 // @route   PUT /api/users/profile
 // @access  Private
 export const updateUserProfile = async (req, res) => {
@@ -127,6 +130,7 @@ export const updateUserProfile = async (req, res) => {
             username: updatedUser.username,
             email: updatedUser.email,
             role: updatedUser.role,
+            avatarUrl: updatedUser.avatarUrl,
         });
     } else {
         res.status(404).json({ message: 'User not found' });
@@ -153,49 +157,40 @@ export const updateUserPassword = async (req, res) => {
     }
 };
 
+// @desc    Update user avatar
+// @route   PUT /api/users/avatar
+// @access  Private
+export const updateUserAvatar = async (req, res) => {
+    try {
+        if (!req.file) {
+            return res.status(400).json({ message: 'No image file provided.' });
+        }
+        const user = await User.findById(req.user._id);
+        if (!user) {
+            return res.status(404).json({ message: 'User not found.' });
+        }
+        user.avatarUrl = req.file.path;
+        await user.save();
+        res.json({
+            message: 'Avatar updated successfully',
+            avatarUrl: user.avatarUrl
+        });
+    } catch (error) {
+        res.status(500).json({ message: `Server Error: ${error.message}` });
+    }
+};
+
 // @desc    Delete user account
 // @route   DELETE /api/users/profile
 // @access  Private
 export const deleteUserAccount = async (req, res) => {
     try {
         const userId = req.user._id;
-        
-        // Anonymize user's content instead of deleting it
         await Observation.updateMany({ user: userId }, { $unset: { user: "" } });
         await Analysis.updateMany({ user: userId }, { $unset: { user: "" } });
-
-        // Delete the user
         await User.findByIdAndDelete(userId);
-
-        // Clear the cookie
         res.cookie('jwt', '', { httpOnly: true, expires: new Date(0) });
-
         res.json({ message: 'Account deleted successfully' });
-    } catch (error) {
-         res.status(500).json({ message: `Server Error: ${error.message}` });
-    }
-};
-
-export const updateUserAvatar = async (req, res) => {
-    try {
-        if (!req.file) {
-            return res.status(400).json({ message: 'No image file provided.' });
-        }
-
-        const user = await User.findById(req.user._id);
-        if (!user) {
-            return res.status(404).json({ message: 'User not found.' });
-        }
-
-        // The secure URL of the uploaded image is on req.file.path
-        user.avatarUrl = req.file.path;
-        await user.save();
-
-        res.json({
-            message: 'Avatar updated successfully',
-            avatarUrl: user.avatarUrl
-        });
-
     } catch (error) {
         res.status(500).json({ message: `Server Error: ${error.message}` });
     }

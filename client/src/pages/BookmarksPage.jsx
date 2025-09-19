@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import axios from '../api/axios';
 import { Loader2, Bookmark } from 'lucide-react';
-import BookmarkCard from '../components/BookmarkCard'; // <-- Import the new card
-import Header from '../components/Header';
+import BookmarkCard from '../components/BookmarkCard';
+import UserPageLayout from '../components/UserPageLayout';
 
 export default function BookmarksPage() {
     const [activeTab, setActiveTab] = useState('observations');
@@ -46,7 +46,7 @@ export default function BookmarksPage() {
             <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
                 {itemsToDisplay.map(item => {
                     const movie = data.movieDetailsMap[item.movieId];
-                    if (!movie) return null; // Failsafe if movie details are missing
+                    if (!movie) return null;
                     return <BookmarkCard key={item._id} bookmark={item} movie={movie} />;
                 })}
             </div>
@@ -56,27 +56,20 @@ export default function BookmarksPage() {
     };
 
     return (
-        <div>
-            <Header/>
-
-            <div className="flex items-center gap-3 mb-6 pb-5 border-b border-gray-200 dark:border-slate-700">
-                <Bookmark className="text-teal-600 dark:text-teal-400" size={28} />
-                <h1 className="text-2xl font-bold text-gray-900 dark:text-slate-100">My Bookmarks</h1>
-            </div>
-
+        <UserPageLayout title="My Bookmarks" icon={Bookmark}>
             {/* Tab Navigation */}
             <div className="mb-6">
-                <nav className="flex space-x-4" aria-label="Tabs">
-                    <button onClick={() => setActiveTab('observations')} className={`${activeTab === 'observations' ? 'bg-teal-100 dark:bg-slate-700 text-teal-700 dark:text-slate-100' : 'text-gray-500 dark:text-slate-300 hover:bg-gray-200 dark:hover:bg-slate-800'} px-4 py-2 font-medium text-sm rounded-md transition-colors`}>
+                <nav className="flex space-x-2 sm:space-x-4" aria-label="Tabs">
+                    <button onClick={() => setActiveTab('observations')} className={`${activeTab === 'observations' ? 'bg-teal-100 dark:bg-slate-700 text-teal-700 dark:text-slate-100' : 'text-gray-500 dark:text-slate-300 hover:bg-gray-200 dark:hover:bg-slate-800'} px-3 sm:px-4 py-2 font-medium text-sm rounded-md transition-colors`}>
                         Observations
                     </button>
-                    <button onClick={() => setActiveTab('analyses')} className={`${activeTab === 'analyses' ? 'bg-teal-100 dark:bg-slate-700 text-teal-700 dark:text-slate-100' : 'text-gray-500 dark:text-slate-300 hover:bg-gray-200 dark:hover:bg-slate-800'} px-4 py-2 font-medium text-sm rounded-md transition-colors`}>
+                    <button onClick={() => setActiveTab('analyses')} className={`${activeTab === 'analyses' ? 'bg-teal-100 dark:bg-slate-700 text-teal-700 dark:text-slate-100' : 'text-gray-500 dark:text-slate-300 hover:bg-gray-200 dark:hover:bg-slate-800'} px-3 sm:px-4 py-2 font-medium text-sm rounded-md transition-colors`}>
                         Analyses
                     </button>
                 </nav>
             </div>
 
             {renderContent()}
-        </div>
+        </UserPageLayout>
     );
 }
