@@ -10,6 +10,9 @@ import ContributorRegister from './pages/ContributorRegister';
 import MovieObservationsPage from './pages/MovieObservationsPage';
 import SearchResultsPage from './pages/SearchResultsPage';
 import ContributorDashboard from './pages/ContributorDashboard';
+import BookmarksPage from './pages/BookmarksPage';
+import ViewingHistoryPage from './pages/ViewingHistoryPage';
+import SettingsPage from './pages/SettingsPage';
 
 export default function App() {
   return (
@@ -27,6 +30,11 @@ export default function App() {
         <Route path="/contributor/login" element={<ContributorLogin />} />
         <Route path="/contributor/register" element={<ContributorRegister />} />
 
+        {/* -- Observer Protected Route -- */}
+        <Route path="/bookmarks" element={<ProtectedRoute><BookmarksPage /></ProtectedRoute>} />
+        <Route path="/history" element={<ProtectedRoute><ViewingHistoryPage /></ProtectedRoute>} />
+        <Route path="/settings" element={<ProtectedRoute><SettingsPage /></ProtectedRoute>} />
+
         {/* Contributor Protected Route */}
         <Route 
           path="/contributor/dashboard" 
@@ -36,6 +44,7 @@ export default function App() {
             </ProtectedRoute>
           } 
         />
+
       </Routes>
     </BrowserRouter>
   )

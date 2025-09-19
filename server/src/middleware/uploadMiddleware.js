@@ -17,14 +17,11 @@ const storage = new CloudinaryStorage({
   params: {
     folder: 'prism_scenes',
     allowed_formats: ['jpeg', 'png', 'jpg'],
-    // transformation: [{ width: 500, height: 500, crop: 'limit' }] // Optional
   },
 });
 
-// Configure multer to use Cloudinary storage
 const upload = multer({ storage: storage });
 
-// Middleware to upload startFrame and endFrame
 export const uploadSceneImages = upload.fields([
   { name: 'startFrame', maxCount: 1 },
   { name: 'endFrame', maxCount: 1 },
@@ -43,8 +40,25 @@ const analysisStorage = new CloudinaryStorage({
   },
 });
 
-// Configure a new multer instance for PDF uploads
+const avatarStorage = new CloudinaryStorage({
+  cloudinary: cloudinary,
+  params: {
+    folder: 'prism_avatars',
+    allowed_formats: ['jpeg', 'png', 'jpg', 'gif'],
+    // Apply a transformation to create a square, 150x150 avatar
+    transformation: [{ width: 150, height: 150, crop: 'fill', gravity: 'face' }],
+    // Generate a unique public_id based on the user's ID to prevent duplicates
+    public_id: (req, file) => `avatar-${req.user._id}`,
+  },
+});
+
 const uploadAnalysisPdf = multer({ storage: analysisStorage });
 
-// Add this new export for handling the analysis PDF upload
+const uploadAvatar = multer({ 
+  storage: avatarStorage,
+  // Optional: Add file size limit
+  limits: { fileSize: 2 * 1024 * 1024 } // 2MB limit
+});
+
+export const uploadAvatarFile = uploadAvatar.single('avatar');
 export const uploadAnalysisFile = uploadAnalysisPdf.single('analysisFile');
