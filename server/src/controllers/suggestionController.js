@@ -7,18 +7,17 @@ export const createSuggestion = async (req, res) => {
     try {
         const { movieId, suggestionType, sceneToEdit, sceneNumber, description, startTime, endTime, notes } = req.body;
 
-        if (!req.files || !req.files.startFrame || !req.files.endFrame) {
-            return res.status(400).json({ message: 'Start and end frame images are required.' });
+        const payload = {};
+        if (description) payload.description = description;
+        if (startTime) payload.startTime = startTime;
+        if (endTime) payload.endTime = endTime;
+        if (sceneNumber) payload.sceneNumber = sceneNumber;
+        if (req.files?.startFrame) payload.startFrameUrl = req.files.startFrame[0].path;
+        if (req.files?.endFrame) payload.endFrameUrl = req.files.endFrame[0].path;
+
+        if (Object.keys(payload).length === 0) {
+            return res.status(400).json({ message: 'No changes were suggested.' });
         }
-        
-        const payload = {
-            description,
-            startTime,
-            endTime,
-            sceneNumber,
-            startFrameUrl: req.files.startFrame[0].path,
-            endFrameUrl: req.files.endFrame[0].path,
-        };
 
         const suggestion = new Suggestion({
             movieId,

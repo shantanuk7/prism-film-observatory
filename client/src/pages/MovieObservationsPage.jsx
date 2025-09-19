@@ -58,6 +58,8 @@ export default function MovieObservationsPage() {
     const [activeCategory, setActiveCategory] = useState('All');
     const [analysisSort, setAnalysisSort] = useState('newest');
 
+    const [editingScene, setEditingScene] = useState(null);
+
     useEffect(() => {
         // If the user is logged in, log this movie to their history
         if (user && movieId) {
@@ -166,6 +168,16 @@ export default function MovieObservationsPage() {
             console.error("Failed to bookmark analysis:", err);
         }
     };
+
+    const handleEditSceneClick = () => {
+        setEditingScene(currentSceneData); // Set the current scene as the one to edit
+        setShowManageScenesModal(true);
+    };
+
+    const handleCloseManageModal = () => {
+        setShowManageScenesModal(false);
+        setEditingScene(null); // Clear the editing scene when modal closes
+    };
     
     // Derived State
     const currentSceneData = scenes.find(s => s.sceneNumber === selectedScene) || {};
@@ -189,7 +201,6 @@ export default function MovieObservationsPage() {
                     onSelectScene={setSelectedScene}
                     user={user}
                     authLoading={authLoading}
-                    // This logic is now correct: Admins manage, Observers suggest
                     onManageScenesClick={() => user?.role === 'admin' ? setShowManageScenesModal(true) : handleSuggestEdit('NEW_SCENE')}
                 />
 
@@ -215,6 +226,7 @@ export default function MovieObservationsPage() {
                                         selectedScene={selectedScene} 
                                         movieDetails={movieDetails}
                                         onSuggestEdit={handleSuggestEdit}
+                                        onEditScene={handleEditSceneClick}
                                     />
                                     <ObservationFeed
                                         observations={processedObservations}
@@ -243,8 +255,6 @@ export default function MovieObservationsPage() {
                 </main>
             </div>
             
-            {/* --- CORRECTED MODAL LOGIC --- */}
-
             {/* Any logged-in user can access these modals */}
             {user && (
                 <>
@@ -277,10 +287,16 @@ export default function MovieObservationsPage() {
             {user?.role === 'admin' && (
                 <ManageScenesModal 
                     isOpen={showManageScenesModal} 
-                    onClose={() => setShowManageScenesModal(false)} 
+                    onClose={handleCloseManageModal} 
                     movieId={movieId} 
                     scenes={scenes} 
-                    onSceneAdded={handleSceneAdded}
+                    onSceneAdded={() => {
+                        // This should be a function to refetch all scenes to see updates
+                        // For now, we'll just close, but a proper implementation would update the state.
+                        console.log("Scene saved, refetching would happen here.");
+                    }}
+                    isEditing={!!editingScene}
+                    sceneToEdit={editingScene}
                 />
             )}
         </div>

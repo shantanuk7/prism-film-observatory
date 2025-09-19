@@ -1,8 +1,8 @@
 import { useState } from 'react';
-import { Share2, Check, Edit } from 'lucide-react'; // Add Edit icon
+import { Share2, Check, Edit, GitPullRequestCreate } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext'; // To check if user is logged in
 
-const SceneDetail = ({ sceneData, selectedScene, movieDetails, onSuggestEdit }) => { // Add onSuggestEdit prop
+const SceneDetail = ({ sceneData, selectedScene, movieDetails, onSuggestEdit, onEditScene }) => { // Add onSuggestEdit prop
     const { user } = useAuth();
     const [copied, setCopied] = useState(false);
 
@@ -16,7 +16,6 @@ const SceneDetail = ({ sceneData, selectedScene, movieDetails, onSuggestEdit }) 
     };
 
     if (!sceneData || !sceneData.description) {
-        // --- ADDED: Prompt to add the first scene ---
         return (
             <div className="text-center text-gray-500 dark:text-slate-400 py-12">
                 <p>No scenes have been added for this movie yet.</p>
@@ -30,11 +29,16 @@ const SceneDetail = ({ sceneData, selectedScene, movieDetails, onSuggestEdit }) 
             <div className="flex justify-between items-start mb-2 gap-4">
                 <h2 className="text-lg font-semibold text-gray-900 dark:text-slate-100">Scene {selectedScene}: Context</h2>
                 <div className="flex items-center flex-shrink-0 gap-2">
-                    {/* --- MODIFIED: Added Suggest an Edit button --- */}
                     {user && (
-                        <button onClick={() => onSuggestEdit('EDIT_SCENE')} className="flex items-center gap-2 px-3 py-1.5 text-xs font-semibold bg-gray-100 dark:bg-slate-700 hover:bg-gray-200 dark:hover:bg-slate-600 rounded-full transition-colors">
-                            <Edit size={14} /> Suggest an Edit
-                        </button>
+                        user.role === 'admin' ? (
+                            <button onClick={onEditScene} className="flex items-center gap-2 px-3 py-1.5 text-xs font-semibold bg-gray-100 dark:bg-slate-700 hover:bg-gray-200 dark:hover:bg-slate-600 rounded-full transition-colors">
+                                <Edit size={14} /> Edit Scene
+                            </button>
+                        ) : (
+                            <button onClick={() => onSuggestEdit('EDIT_SCENE')} className="flex items-center gap-2 px-3 py-1.5 text-xs font-semibold bg-gray-100 dark:bg-slate-700 hover:bg-gray-200 dark:hover:bg-slate-600 rounded-full transition-colors">
+                                <GitPullRequestCreate size={14} /> Suggest an Edit
+                            </button>
+                        )
                     )}
                     <button onClick={handleCite} className="flex items-center gap-2 px-3 py-1.5 text-xs font-semibold bg-gray-100 dark:bg-slate-700 hover:bg-gray-200 dark:hover:bg-slate-600 rounded-full transition-colors">
                         {copied ? <Check size={14} className="text-green-500"/> : <Share2 size={14} />}
@@ -42,7 +46,6 @@ const SceneDetail = ({ sceneData, selectedScene, movieDetails, onSuggestEdit }) 
                     </button>
                 </div>
             </div>
-            {/* ... rest of the component ... */}
             <p className="text-gray-600 dark:text-slate-300 text-sm mb-4">{sceneData.description}</p>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>

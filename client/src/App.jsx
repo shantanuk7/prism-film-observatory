@@ -5,8 +5,8 @@ import ProtectedRoute from './components/ProtectedRoute';
 import Home from './pages/Home';
 import ObserverLogin from './pages/ObserverLogin';
 import ObserverRegister from './pages/ObserverRegister';
-import ContributorLogin from './pages/ContributorLogin';
-import ContributorRegister from './pages/ContributorRegister';
+import AdminLogin from './pages/AdminLogin';
+import AdminRegister from './pages/AdminRegister';
 import MovieObservationsPage from './pages/MovieObservationsPage';
 import SearchResultsPage from './pages/SearchResultsPage';
 import AdminDashboard from './pages/AdminDashboard';
@@ -27,8 +27,8 @@ export default function App() {
         {/* Auth Routes */}
         <Route path="/observer/login" element={<ObserverLogin />} />
         <Route path="/observer/register" element={<ObserverRegister />} />
-        <Route path="/contributor/login" element={<ContributorLogin />} />
-        <Route path="/contributor/register" element={<ContributorRegister />} />
+        <Route path="/admin/login" element={<AdminLogin />} />
+        <Route path="/admin/register" element={<AdminRegister />} />
 
         {/* -- Observer Protected Route -- */}
         <Route path="/bookmarks" element={<ProtectedRoute><BookmarksPage /></ProtectedRoute>} />

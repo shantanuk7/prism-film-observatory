@@ -1,66 +1,45 @@
-import React, { useState, useEffect } from 'react';
-import axios from '../api/axios';
-import { Loader2, ShieldCheck } from 'lucide-react';
+import React, { useState } from 'react';
+import { ShieldCheck } from 'lucide-react';
 import UserPageLayout from '../components/UserPageLayout';
-import SuggestionCard from '../components/admin/SuggestionCard';
+import SuggestionReviewPanel from '../components/admin/SuggestionReviewPanel'; 
+import UserManagementPanel from '../components/admin/UserManagementPanel';
 
 export default function AdminDashboard() {
-    const [suggestions, setSuggestions] = useState([]);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState('');
-
-    const fetchSuggestions = async () => {
-        try {
-            setLoading(true);
-            const { data } = await axios.get('/admin/suggestions');
-            setSuggestions(data);
-        } catch (err) {
-            setError('Failed to load suggestions.');
-            console.error(err);
-        } finally {
-            setLoading(false);
-        }
-    };
-
-    useEffect(() => {
-        fetchSuggestions();
-    }, []);
-    
-    // Function to handle approving or rejecting, passed to child
-    const handleUpdateSuggestion = (suggestionId) => {
-        // Remove the suggestion from the list optimistically
-        setSuggestions(prev => prev.filter(s => s._id !== suggestionId));
-    };
-
-    const renderContent = () => {
-        if (loading) {
-            return <div className="flex justify-center items-center h-64"><Loader2 className="animate-spin text-teal-500" size={48} /></div>;
-        }
-        if (error) {
-            return <p className="text-center text-red-500">{error}</p>;
-        }
-        if (suggestions.length === 0) {
-            return <p className="text-center text-gray-500 dark:text-slate-400 py-12">No pending suggestions. All caught up!</p>;
-        }
-        return (
-            <div className="space-y-6">
-                {suggestions.map(suggestion => (
-                    <SuggestionCard 
-                        key={suggestion._id} 
-                        suggestion={suggestion}
-                        onUpdate={handleUpdateSuggestion}
-                    />
-                ))}
-            </div>
-        );
-    };
+    const [activeTab, setActiveTab] = useState('suggestions');
 
     return (
         <UserPageLayout title="Admin Dashboard" icon={ShieldCheck}>
-            <p className="text-sm text-gray-600 dark:text-slate-400 mb-6 -mt-4">
-                Review and approve or reject user-submitted scene suggestions.
-            </p>
-            {renderContent()}
+            {/* Tab Navigation */}
+            <div className="mb-6 border-b border-gray-200 dark:border-slate-700">
+                <nav className="-mb-px flex space-x-6" aria-label="Tabs">
+                    <button
+                        onClick={() => setActiveTab('suggestions')}
+                        className={`${
+                            activeTab === 'suggestions'
+                                ? 'border-teal-500 text-teal-600 dark:text-teal-400'
+                                : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-slate-400 dark:hover:text-slate-200 dark:hover:border-slate-600'
+                        } whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm transition-colors`}
+                    >
+                        Pending Suggestions
+                    </button>
+                    <button
+                        onClick={() => setActiveTab('users')}
+                        className={`${
+                            activeTab === 'users'
+                                ? 'border-teal-500 text-teal-600 dark:text-teal-400'
+                                : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-slate-400 dark:hover:text-slate-200 dark:hover:border-slate-600'
+                        } whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm transition-colors`}
+                    >
+                        User Management
+                    </button>
+                </nav>
+            </div>
+
+            {/* Content based on active tab */}
+            <div>
+                {activeTab === 'suggestions' && <SuggestionReviewPanel />}
+                {activeTab === 'users' && <UserManagementPanel />}
+            </div>
         </UserPageLayout>
     );
 }

@@ -66,3 +66,39 @@ export const getScenesForMovie = async (req, res) => {
         res.status(500).json({ message: `Server Error: ${error.message}` });
     }
 };
+
+// @desc    Update an existing scene
+// @route   PUT /api/scenes/:id
+// @access  Private (Admin)
+export const updateScene = async (req, res) => {
+    try {
+        const scene = await Scene.findById(req.params.id);
+
+        if (!scene) {
+            return res.status(404).json({ message: 'Scene not found.' });
+        }
+
+        const { description, startTime, endTime } = req.body;
+        
+        // Update text fields
+        scene.description = description || scene.description;
+        scene.startTime = startTime || scene.startTime;
+        scene.endTime = endTime || scene.endTime;
+
+        // Check for and update new frame images if they were uploaded
+        if (req.files) {
+            if (req.files.startFrame) {
+                scene.startFrameUrl = req.files.startFrame[0].path;
+            }
+            if (req.files.endFrame) {
+                scene.endFrameUrl = req.files.endFrame[0].path;
+            }
+        }
+
+        const updatedScene = await scene.save();
+        res.json(updatedScene);
+
+    } catch (error) {
+        res.status(500).json({ message: `Server Error: ${error.message}` });
+    }
+};
