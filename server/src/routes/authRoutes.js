@@ -1,19 +1,16 @@
-import express from 'express'
-import { registerUser, loginUser, logoutUser, getMe } from '../controllers/authController.js'
-import { protect } from '../middleware/authMiddleware.js'
+import express from 'express';
+import { registerUser, loginUser, logoutUser, getMe, verifyEmail } from '../controllers/authController.js';
+import { protect } from '../middleware/authMiddleware.js';
 
-const router = express.Router()
+const router = express.Router();
 
-// Observer
-router.post('/observer/register', (req, res) => registerUser(req, res))
-router.post('/observer/login', (req, res) => loginUser(req, res))
+// Simplified routes that the new frontend uses
+router.post('/register', registerUser);
+router.post('/login', loginUser);
+router.post('/logout', logoutUser);
+router.get('/me', protect, getMe);
 
-// Admin
-router.post('/admin/register', (req, res) => registerUser(req, res))
-router.post('/admin/login', (req, res) => loginUser(req, res))
+// New route for handling the email verification link
+router.post('/verify-email', verifyEmail);
 
-// Common
-router.post('/logout', logoutUser)
-router.get('/me', protect, getMe)
-
-export default router
+export default router;

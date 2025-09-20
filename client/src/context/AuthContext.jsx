@@ -10,8 +10,8 @@ export const AuthProvider = ({ children }) => {
   useEffect(() => {
     const fetchUser = async () => {
       try {
-        const res = await axios.get('/auth/me')
-        setUser(res.data)
+        const { data } = await axios.get('/auth/me')
+        setUser(data)
       } catch {
         setUser(null)
       } finally {
@@ -21,10 +21,10 @@ export const AuthProvider = ({ children }) => {
     fetchUser()
   }, [])
 
-  const login = async (endpoint, data) => {
-    const res = await axios.post(`/auth/${endpoint}`, data)
-    setUser(res.data.user)
-  }
+  // --- MODIFIED: Login function now just sets the user state ---
+  const login = (userData) => {
+    setUser(userData);
+  };
 
   const logout = async () => {
     await axios.post('/auth/logout')
@@ -38,4 +38,4 @@ export const AuthProvider = ({ children }) => {
   )
 }
 
-export const useAuth = () => useContext(AuthContext)
+export const useAuth = () => useContext(AuthContext)
