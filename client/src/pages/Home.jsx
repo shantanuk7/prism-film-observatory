@@ -102,9 +102,6 @@ const Hero = () => (
         <div className="relative h-full flex flex-col items-center justify-center text-center text-white px-4">
             <h1 className="text-4xl md:text-5xl font-extrabold tracking-tight">Deconstruct Your Favorite Films</h1>
             <p className="mt-4 max-w-2xl text-lg text-gray-300">Join a community of film enthusiasts in scene-by-scene analysis and in-depth discussion.</p>
-            <Link to="/movies" className="mt-8 inline-flex items-center justify-center px-6 py-3 border border-transparent text-base font-medium rounded-md text-white bg-teal-600 hover:bg-teal-700">
-                Explore Films
-            </Link>
         </div>
     </div>
 );

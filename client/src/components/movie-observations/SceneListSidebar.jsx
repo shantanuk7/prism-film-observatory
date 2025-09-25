@@ -1,7 +1,7 @@
 import React from 'react';
 import { Plus, GitPullRequestCreate } from 'lucide-react';
 
-const SceneListSidebar = ({ scenes, selectedScene, onSelectScene, user, authLoading, onManageScenesClick }) => {
+const SceneListSidebar = ({ scenes, selectedScene, onSelectScene, user, authLoading, onManageScenesClick, onSuggestNewSceneClick }) => {
     return (
         <aside className="w-80 bg-white dark:bg-slate-900 border-r border-gray-200 dark:border-slate-800 flex-col fixed top-16 left-0 h-[calc(100vh-4rem)] z-10 hidden lg:flex transition-colors">
             <nav className="flex-grow p-4 overflow-y-auto">
