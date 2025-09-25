@@ -13,6 +13,7 @@ import AdminDashboard from './pages/AdminDashboard';
 import BookmarksPage from './pages/BookmarksPage';
 import ViewingHistoryPage from './pages/ViewingHistoryPage';
 import SettingsPage from './pages/SettingsPage';
+import VerifyEmailPage from './pages/VerifyEmailPage';
 
 export default function App() {
   return (
@@ -29,6 +30,8 @@ export default function App() {
         <Route path="/observer/register" element={<ObserverRegister />} />
         <Route path="/admin/login" element={<AdminLogin />} />
         <Route path="/admin/register" element={<AdminRegister />} />
+
+        <Route path="/verify-email" element={<VerifyEmailPage />} />
 
         {/* -- Observer Protected Route -- */}
         <Route path="/bookmarks" element={<ProtectedRoute><BookmarksPage /></ProtectedRoute>} />

@@ -5,80 +5,124 @@ import { useAuth } from '../context/AuthContext';
 import { User, Mail, KeyRound, Loader2, AlertCircle, CheckCircle } from 'lucide-react';
 import AuthLayout from '../components/AuthLayout';
 
-// Reusable Input Field Component
-const InputField = ({ name, type, placeholder, value, onChange, icon }) => {
+// --- MODIFIED: InputField now accepts and displays an 'error' prop ---
+const InputField = ({ name, type, placeholder, value, onChange, icon, error }) => {
     const Icon = icon;
+    const errorClasses = "ring-red-500 dark:ring-red-500 focus:ring-red-500";
+    const defaultClasses = "ring-gray-300 dark:ring-slate-600 focus:ring-teal-500";
+
     return (
-        <div className="relative">
-            <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
-                <Icon className="h-5 w-5 text-gray-400" aria-hidden="true" />
+        <div>
+            <div className="relative">
+                <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
+                    <Icon className="h-5 w-5 text-gray-400" aria-hidden="true" />
+                </div>
+                <input
+                    id={name}
+                    name={name}
+                    type={type}
+                    value={value}
+                    onChange={onChange}
+                    placeholder={placeholder}
+                    required
+                    className={`block w-full rounded-md border-0 py-3 pl-10 text-gray-900 dark:text-slate-200 bg-white dark:bg-slate-700/50 ring-1 ring-inset placeholder:text-gray-400 focus:ring-2 focus:ring-inset sm:text-sm ${error ? errorClasses : defaultClasses}`}
+                />
             </div>
-            <input
-                id={name}
-                name={name}
-                type={type}
-                value={value}
-                onChange={onChange}
-                placeholder={placeholder}
-                required
-                className="block w-full rounded-md border-0 py-3 pl-10 text-gray-900 dark:text-slate-200 bg-white dark:bg-slate-700/50 ring-1 ring-inset ring-gray-300 dark:ring-slate-600 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-teal-500 sm:text-sm"
-            />
+            {error && <p className="mt-1 text-xs text-red-600 dark:text-red-400">{error}</p>}
         </div>
     );
 };
 
+
 export function AuthForm({ type, role }) {
-    const [form, setForm] = useState({ username: '', email: '', password: '' });
-    const [error, setError] = useState('');
+    const [form, setForm] = useState({ username: '', email: '', password: '', confirmPassword: '' });
+    // --- MODIFIED: Changed from a single error string to an errors object ---
+    const [errors, setErrors] = useState({});
     const [successMessage, setSuccessMessage] = useState('');
     const [loading, setLoading] = useState(false);
     
     const { login } = useAuth();
     const navigate = useNavigate();
 
-    const handleChange = e => setForm({ ...form, [e.target.name]: e.target.value });
+    const handleChange = e => {
+        setForm({ ...form, [e.target.name]: e.target.value });
+        // Clear error for the field being edited
+        if (errors[e.target.name]) {
+            setErrors({ ...errors, [e.target.name]: null });
+        }
+    };
 
+    // --- MODIFIED: Complete overhaul of validation logic ---
     const validateForm = () => {
-        if (type === 'register' && !form.username.trim()) {
-            setError('Username is required.');
-            return false;
+        const newErrors = {};
+        
+        // Username validation
+        if (type === 'register') {
+            if (!form.username.trim()) {
+                newErrors.username = 'Username is required.';
+            } else if (form.username.length < 3) {
+                newErrors.username = 'Username must be at least 3 characters long.';
+            } else if (!/^[a-zA-Z0-9_]+$/.test(form.username)) {
+                newErrors.username = 'Username can only contain letters, numbers, and underscores.';
+            }
         }
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        if (!emailRegex.test(form.email)) {
-            setError('Please enter a valid email address.');
-            return false;
+        
+        // Email validation
+        if (!form.email) {
+            newErrors.email = 'Email is required.';
+        } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) {
+            newErrors.email = 'Please enter a valid email address.';
         }
-        if (form.password.length < 6) {
-            setError('Password must be at least 6 characters long.');
-            return false;
+
+        // Password validation
+        if (!form.password) {
+            newErrors.password = 'Password is required.';
+        } else if (form.password.length < 8) {
+            newErrors.password = 'Password must be at least 8 characters long.';
+        } else if (!/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/.test(form.password)) {
+            newErrors.password = 'Password must contain at least one uppercase letter, one lowercase letter, and one number.';
         }
-        return true;
+
+        // Confirm Password validation
+        if (type === 'register') {
+            if (!form.confirmPassword) {
+                newErrors.confirmPassword = 'Please confirm your password.';
+            } else if (form.password && form.password !== form.confirmPassword) {
+                newErrors.confirmPassword = 'Passwords do not match.';
+            }
+        }
+
+        setErrors(newErrors);
+        // Returns true if the newErrors object is empty
+        return Object.keys(newErrors).length === 0;
     };
 
     const handleSubmit = async e => {
         e.preventDefault();
-        setError('');
+        
+        if (!validateForm()) {
+            return; // Stop submission if validation fails
+        }
+        
         setSuccessMessage('');
-
-        if (!validateForm()) return;
-
         setLoading(true);
+
         try {
-            const endpoint = type; // 'login' or 'register'
-            const payload = { ...form, role };
+            const endpoint = type;
+            const { confirmPassword, ...formData } = form;
+            const payload = { ...formData, role };
             
-            // --- MODIFIED: Direct API call with simplified endpoint ---
             const res = await axios.post(`/auth/${endpoint}`, payload);
 
             if (type === 'register') {
                 setSuccessMessage(res.data.message);
             } else {
-                // For login, use the AuthContext and navigate
                 login(res.data.user);
                 navigate('/');
             }
         } catch (err) {
-            setError(err.response?.data?.message || 'An unexpected error occurred.');
+            // Display server-side errors in a general error box
+            setErrors({ form: err.response?.data?.message || 'An unexpected error occurred.' });
         } finally {
             setLoading(false);
         }
@@ -97,15 +141,20 @@ export function AuthForm({ type, role }) {
                 {!successMessage ? (
                     <form onSubmit={handleSubmit} className="space-y-4">
                         {type === 'register' && (
-                            <InputField name="username" type="text" placeholder="Username" value={form.username} onChange={handleChange} icon={User} />
+                            <InputField name="username" type="text" placeholder="Username" value={form.username} onChange={handleChange} icon={User} error={errors.username} />
                         )}
-                        <InputField name="email" type="email" placeholder="Email Address" value={form.email} onChange={handleChange} icon={Mail} />
-                        <InputField name="password" type="password" placeholder="Password" value={form.password} onChange={handleChange} icon={KeyRound} />
+                        <InputField name="email" type="email" placeholder="Email Address" value={form.email} onChange={handleChange} icon={Mail} error={errors.email} />
+                        <InputField name="password" type="password" placeholder="Password" value={form.password} onChange={handleChange} icon={KeyRound} error={errors.password} />
                         
-                        {error && (
+                        {type === 'register' && (
+                            <InputField name="confirmPassword" type="password" placeholder="Confirm Password" value={form.confirmPassword} onChange={handleChange} icon={KeyRound} error={errors.confirmPassword} />
+                        )}
+                        
+                        {/* --- MODIFIED: For general form errors from the server --- */}
+                        {errors.form && (
                             <div className="flex items-center gap-2 text-sm text-red-600 bg-red-50 dark:bg-red-500/10 p-3 rounded-md">
                                 <AlertCircle className="h-5 w-5"/>
-                                <span>{error}</span>
+                                <span>{errors.form}</span>
                             </div>
                         )}
                         
