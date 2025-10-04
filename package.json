@@ -1,6 +1,7 @@
 {
   "devDependencies": {
-    "concurrently": "^9.2.1"
+    "concurrently": "^9.2.1",
+    "wait-on": "^9.0.1"
   },
   "name": "prism-film-observatory",
   "version": "1.0.0",
@@ -34,7 +35,7 @@
   "scripts": {
     "start:backend": "npm run dev --prefix server",
     "start:frontend": "npm run dev --prefix client",
-    "dev": "concurrently \"npm run start:backend\" \"npm run start:frontend\""
+    "dev": "concurrently \"npm run start:backend\" \"wait-on http://localhost:5000 && npm run start:frontend\""
   },
   "repository": {
     "type": "git",
