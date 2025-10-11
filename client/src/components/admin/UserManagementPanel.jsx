@@ -8,7 +8,7 @@ export default function UserManagementPanel() {
     const [users, setUsers] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
-    const [activeMenu, setActiveMenu] = useState(null); // To control which user's menu is open
+    const [activeMenu, setActiveMenu] = useState(null);
 
     const fetchUsers = async () => {
         try {
@@ -62,7 +62,8 @@ export default function UserManagementPanel() {
                     </tr>
                 </thead>
                 <tbody className="bg-white dark:bg-slate-800 divide-y divide-gray-200 dark:divide-slate-700">
-                    {users.map((user) => (
+                    {/* --- CHANGE 1: Get the index from the map function --- */}
+                    {users.map((user, index) => (
                         <tr key={user._id}>
                             <td className="px-6 py-4 whitespace-nowrap">
                                 <div className="flex items-center">
@@ -86,7 +87,11 @@ export default function UserManagementPanel() {
                                         <MoreVertical size={16}/>
                                     </button>
                                     {activeMenu === user._id && (
-                                        <div className="origin-top-right absolute right-0 mt-2 w-48 rounded-md shadow-lg bg-white dark:bg-slate-900 ring-1 ring-black ring-opacity-5 z-10">
+                                        /* --- CHANGE 2: Conditionally apply positioning classes --- */
+                                        <div className={`
+                                            absolute right-0 w-48 rounded-md shadow-lg bg-white dark:bg-slate-900 ring-1 ring-black ring-opacity-5 z-10
+                                            ${index >= users.length - 2 ? 'bottom-full origin-bottom-right mb-2' : 'origin-top-right mt-2'}
+                                        `}>
                                             <div className="py-1">
                                                 {user.role === 'observer' ? (
                                                     <button onClick={() => handleRoleChange(user._id, 'admin')} className="w-full text-left flex items-center gap-3 px-4 py-2 text-sm text-gray-700 dark:text-slate-300 hover:bg-gray-100 dark:hover:bg-slate-800">
@@ -98,7 +103,7 @@ export default function UserManagementPanel() {
                                                     </button>
                                                 )}
                                                 {currentUser._id !== user._id && (
-                                                     <button onClick={() => handleDeleteUser(user._id)} className="w-full text-left flex items-center gap-3 px-4 py-2 text-sm text-red-600 dark:text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10">
+                                                    <button onClick={() => handleDeleteUser(user._id)} className="w-full text-left flex items-center gap-3 px-4 py-2 text-sm text-red-600 dark:text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10">
                                                         <Trash2 size={14}/> Delete User
                                                     </button>
                                                 )}

@@ -17,6 +17,7 @@ import NewObservationModal from '../components/movie-observations/modals/NewObse
 import UploadAnalysisModal from '../components/movie-observations/modals/UploadAnalysisModal';
 import ManageScenesModal from '../components/movie-observations/modals/ManageScenesModal';
 import SuggestionModal from '../components/movie-observations/modals/SuggestionModal';
+import { Link } from 'react-router-dom';
 
 export default function MovieObservationsPage() {
     const { user, loading: authLoading, setUser } = useAuth();
@@ -263,14 +264,21 @@ export default function MovieObservationsPage() {
                                 ) : (
                                     // If no scenes exist, show this single message
                                     <div className="text-center text-gray-500 dark:text-slate-400 py-12">
-                                        <p className="mb-4">No scenes have been added for this movie yet.</p>
-                                        {user && (
+                                        <p className="mb-20">No scenes have been added for this movie yet.</p>
+                                        {user ? (
                                             <button 
                                                 onClick={() => handleSuggestEdit('NEW_SCENE')} 
                                                 className="px-4 py-2 text-sm font-medium text-white bg-teal-600 rounded-md hover:bg-teal-700"
                                             >
                                                 Be the first to add one!
                                             </button>
+                                        ) : (
+                                            <div className="mt-8 text-center bg-white dark:bg-slate-800 border border-teal-500/20 dark:border-teal-400/20 rounded-lg p-6">
+                                                <h3 className="font-semibold text-gray-900 dark:text-white">Want to suggest scenes?</h3>
+                                                <p className="mt-1 text-sm text-gray-600 dark:text-slate-300">
+                                                    <Link to="/observer/login" className="text-teal-600 dark:text-teal-400 font-medium hover:underline">Log in</Link> or <Link to="/observer/register" className="text-teal-600 dark:text-teal-400 font-medium hover:underline">sign up</Link> to suggest a movie scene for this movie.
+                                                </p>
+                                            </div>
                                         )}
                                     </div>
                                 )

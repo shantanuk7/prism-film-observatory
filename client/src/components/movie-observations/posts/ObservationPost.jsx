@@ -5,6 +5,10 @@ import { formatDistanceToNow } from 'date-fns';
 const ObservationPost = ({ observation, onLike, onBookmark, user }) => {
     const isLiked = user && observation.likes.includes(user._id);
     const isBookmarked = user && user.bookmarks?.includes(observation._id);
+    
+    // Safely access the avatar URL and username from the observation's user data
+    const avatarUrl = observation.user?.avatarUrl;
+    const username = observation.user?.username || 'User';
 
     const handleShare = () => {
         const url = `${window.location.origin}/movie/${observation.movieId}`;
@@ -16,10 +20,21 @@ const ObservationPost = ({ observation, onLike, onBookmark, user }) => {
     return (
         <div className="bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-lg p-5 mb-4 transition-colors shadow-sm hover:shadow-md">
             <div className="flex items-start gap-4">
-                <UserCircle className="text-gray-400 dark:text-slate-500 flex-shrink-0" size={40} />
+                {/* --- AVATAR LOGIC START --- */}
+                {avatarUrl ? (
+                    <img 
+                        src={avatarUrl} 
+                        alt={`${username}'s avatar`}
+                        className="w-10 h-10 rounded-full object-cover flex-shrink-0"
+                    />
+                ) : (
+                    <UserCircle className="text-gray-400 dark:text-slate-500 flex-shrink-0" size={40} />
+                )}
+                {/* --- AVATAR LOGIC END --- */}
+
                 <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 mb-1">
-                        <span className="font-semibold text-gray-900 dark:text-slate-100">{observation.user?.username || 'User'}</span>
+                        <span className="font-semibold text-gray-900 dark:text-slate-100">{username}</span>
                         <span className="text-gray-500 dark:text-slate-400 text-sm font-light">• {formatDistanceToNow(new Date(observation.createdAt), { addSuffix: true })}</span>
                     </div>
                     <p className="text-gray-800 dark:text-slate-300 mb-3 leading-relaxed">{observation.content}</p>

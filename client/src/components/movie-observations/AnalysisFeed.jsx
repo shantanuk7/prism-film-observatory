@@ -14,21 +14,23 @@ const AnalysisFeed = ({ analyses, user, onLike, onBookmark, sort, setSort }) => 
       );
     }
     return (
-      <div className="space-y-6">
-        {analyses.map(anl => (
-          <AnalysisPost key={anl._id} analysis={anl} user={user} onLike={onLike} onBookmark={onBookmark} />
-        ))}
+      <div>
+        <FilterBar
+          sort={sort}
+          setSort={setSort}
+          type="analyses"
+        />
+        <div className="space-y-6">
+          {analyses.map(anl => (
+            <AnalysisPost key={anl._id} analysis={anl} user={user} onLike={onLike} onBookmark={onBookmark} />
+          ))}
+        </div>
       </div>
     );
   };
     
   return (
     <div>
-      <FilterBar
-        sort={sort}
-        setSort={setSort}
-        type="analyses"
-      />
 
       {renderFeed()}
       

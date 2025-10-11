@@ -54,9 +54,9 @@ const ObservationFeed = ({
 
       {!user && (
         <div className="mt-8 text-center bg-white dark:bg-slate-800 border border-teal-500/20 dark:border-teal-400/20 rounded-lg p-6">
-          <h3 className="font-semibold text-gray-900 dark:text-white">Join the Discussion!</h3>
+          <h3 className="font-semibold text-gray-900 dark:text-white">Want to contribute?</h3>
           <p className="mt-1 text-sm text-gray-600 dark:text-slate-300">
-            <Link to="/observer/login" className="text-teal-600 dark:text-teal-400 font-medium hover:underline">Log in</Link> or <Link to="/observer/register" className="text-teal-600 dark:text-teal-400 font-medium hover:underline">sign up</Link> to like, save, and share your favorite observations.
+            <Link to="/observer/login" className="text-teal-600 dark:text-teal-400 font-medium hover:underline">Log in</Link> or <Link to="/observer/register" className="text-teal-600 dark:text-teal-400 font-medium hover:underline">sign up</Link> to upload your own in-depth analysis.
           </p>
         </div>
       )}

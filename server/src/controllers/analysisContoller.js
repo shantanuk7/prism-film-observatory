@@ -30,7 +30,7 @@ export const createAnalysis = async (req, res) => {
     });
 
     const createdAnalysis = await analysis.save();
-    await createdAnalysis.populate('user', 'username');
+    await createdAnalysis.populate('user', 'username avatarUrl');
     res.status(201).json(createdAnalysis);
   } catch (error) {
     console.error('ERROR CREATING ANALYSIS:', error); 
@@ -43,7 +43,7 @@ export const createAnalysis = async (req, res) => {
 export const getAnalysesForMovie = async (req, res) => {
   try {
     const analyses = await Analysis.find({ movieId: req.params.movieId })
-      .populate('user', 'username')
+      .populate('user', 'username avatarUrl')
       .sort({ createdAt: -1 });
 
     res.json(analyses);

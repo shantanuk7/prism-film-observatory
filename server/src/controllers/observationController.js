@@ -22,8 +22,10 @@ export const createObservation = async (req, res) => {
     });
 
     const createdObservation = await observation.save();
-    // Populate user details before sending back
-    await createdObservation.populate('user', 'username');
+
+    // The Fix: Also populate the avatarUrl
+    await createdObservation.populate('user', 'username avatarUrl');
+    
     res.status(201).json(createdObservation);
   } catch (error) {
     res.status(500).json({ message: `Server Error: ${error.message}` });
@@ -36,7 +38,7 @@ export const createObservation = async (req, res) => {
 export const getObservationsForMovie = async (req, res) => {
   try {
     const observations = await Observation.find({ movieId: req.params.movieId })
-      .populate('user', 'username') // Only get username from user doc
+      .populate('user', 'username avatarUrl') // Only get username from user doc
       .sort({ createdAt: -1 }); // Show newest first
 
     res.json(observations);
