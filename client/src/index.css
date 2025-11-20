@@ -17,3 +17,56 @@
 * {
   box-sizing: border-box;
 }
+
+@layer utilities {
+  /* 1. Firefox (Uses distinct properties) */
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: #adb8c5 transparent; /* Light mode thumb / track */
+  }
+
+  /* Dark mode for Firefox */
+  .dark * {
+    scrollbar-color: #334155 transparent; /* Dark mode thumb / track */
+  }
+
+  /* 2. WebKit Browsers (Chrome, Edge, Safari) */
+  ::-webkit-scrollbar {
+    width: 10px;  /* Vertical scrollbar width */
+    height: 10px; /* Horizontal scrollbar height */
+  }
+
+  ::-webkit-scrollbar-track {
+    background: transparent; 
+  }
+
+  /* The moving part (Thumb) */
+  ::-webkit-scrollbar-thumb {
+    background-color: #cbd5e1; /* gray-300 */
+    border-radius: 20px;       /* Pill shape */
+    border: 3px solid transparent; /* Creates a padding effect around the thumb */
+    background-clip: content-box;  /* Ensures the border looks like padding */
+  }
+
+  /* Thumb Hover State */
+  ::-webkit-scrollbar-thumb:hover {
+    background-color: #94a3b8; /* gray-400 */
+  }
+
+  /* --------------------------------------------------------- */
+  /* DARK MODE OVERRIDES                         */
+  /* --------------------------------------------------------- */
+  
+  .dark ::-webkit-scrollbar-thumb {
+    background-color: #334155; /* slate-700 */
+  }
+
+  .dark ::-webkit-scrollbar-thumb:hover {
+    background-color: #475569; /* slate-600 */
+  }
+
+  /* Active State (When clicking the scrollbar) */
+  .dark ::-webkit-scrollbar-thumb:active {
+    background-color: #0d9488; /* teal-600 */
+  }
+}

@@ -2,7 +2,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 
-const prismLogo = '/src/assets/logo.png'; // Make sure this path is correct
+const prismLogo = '/logo.png';
 
 const AuthLayout = ({ children }) => {
     return (

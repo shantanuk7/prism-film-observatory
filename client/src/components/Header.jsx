@@ -4,7 +4,7 @@ import { Search, Bookmark, History } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import ThemeToggle from './ThemeToggle';
 
-const prismLogo = '../src/assets/logo.png';
+const prismLogo = '/logo.png';
 
 export default function Header() {
   const { user, logout, loading } = useAuth();
@@ -104,8 +104,8 @@ export default function Header() {
                 <>
                   <ThemeToggle />
                   <div className="flex items-center gap-2">
-                    <button onClick={() => navigate('/observer/login')} className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-slate-200 hover:bg-gray-100 dark:hover:bg-slate-800 rounded-md transition-colors">Log In</button>
-                    <button onClick={() => navigate('/observer/register')} className="px-4 py-2 text-sm font-medium text-white bg-teal-600 rounded-md hover:bg-teal-700 transition-colors">Sign Up</button>
+                    <button onClick={() => navigate('/observer/login')} className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-slate-200 hover:bg-gray-100 dark:hover:bg-slate-800 rounded-md transition-colors cursor-pointer">Log In</button>
+                    <button onClick={() => navigate('/observer/register')} className="px-4 py-2 text-sm font-medium text-white bg-teal-600 rounded-md hover:bg-teal-700 transition-colors cursor-pointer">Sign Up</button>
                   </div>
                 </>
               )}

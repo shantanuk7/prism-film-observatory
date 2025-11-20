@@ -32,7 +32,7 @@ const SceneListSidebar = ({ scenes, selectedScene, onSelectScene, user, authLoad
                 {!authLoading && user && (
                     user.role === 'admin' ? (
                         <button onClick={onManageScenesClick} className="w-full flex items-center justify-center gap-2 px-3 py-2 text-sm font-medium text-white bg-teal-600 hover:bg-teal-700 rounded-md transition-colors">
-                            <Plus size={16} /> Manage Scenes
+                            <Plus size={16} /> Add Scene
                         </button>
                     ) : (
                         <button onClick={onSuggestNewSceneClick} className="w-full flex items-center justify-center gap-2 px-3 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-md transition-colors">
