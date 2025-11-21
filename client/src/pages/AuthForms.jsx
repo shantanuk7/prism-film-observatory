@@ -1,11 +1,10 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import axios from '../api/axios'; // Use the configured axios instance
+import axios from '../api/axios';
 import { useAuth } from '../context/AuthContext';
 import { User, Mail, KeyRound, Loader2, AlertCircle, CheckCircle } from 'lucide-react';
 import AuthLayout from '../components/AuthLayout';
 
-// --- MODIFIED: InputField now accepts and displays an 'error' prop ---
 const InputField = ({ name, type, placeholder, value, onChange, icon, error }) => {
     const Icon = icon;
     const errorClasses = "ring-red-500 dark:ring-red-500 focus:ring-red-500";
@@ -162,7 +161,7 @@ export function AuthForm({ type, role }) {
                             <button
                                 type="submit"
                                 disabled={loading}
-                                className="flex w-full justify-center items-center gap-2 rounded-md bg-teal-600 px-3 py-3 text-sm font-semibold text-white shadow-sm hover:bg-teal-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal-600 disabled:opacity-50"
+                                className="flex w-full justify-center items-center gap-2 rounded-md bg-teal-600 px-3 py-3 text-sm font-semibold text-white shadow-sm hover:bg-teal-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal-600 disabled:opacity-50"
                             >
                                 {loading && <Loader2 className="h-5 w-5 animate-spin" />}
                                 {loading ? 'Processing...' : (type === 'login' ? 'Log In' : 'Create Account')}
