@@ -18,7 +18,7 @@ const transporter = nodemailer.createTransport({
  * @param {string} token - The unique verification token.
  */
 export const sendVerificationEmail = async (to, token) => {
-    const verificationUrl = `http://${API_CLIENT_ORIGIN}/verify-email?token=${token}`;
+    const verificationUrl = `http://${process.env.API_CLIENT_ORIGIN}/verify-email?token=${token}`;
 
     const mailOptions = {
         from: `"Prism App" <${process.env.EMAIL_USER}>`,
