@@ -43,7 +43,7 @@ const ObservationFeed = ({
         type="observations"
       />
 
-      <QuickStats 
+      <QuickStats   
         totalCount={categories.length > 0 ? observations.length : 0}
         filteredCount={observations.length}
         activeCategory={activeCategory}

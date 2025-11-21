@@ -15,7 +15,7 @@ const SuggestionModal = ({ isOpen, onClose, movieId, suggestionType, sceneToEdit
     const [apiError, setApiError] = useState('');
     
     const startFrameRef = useRef(null);
-    const endFrameRef = useRef(null);
+    const endFrameRef = useRef(null);   
 
     // 1. Reset State on Open
     useEffect(() => {

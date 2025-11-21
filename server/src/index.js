@@ -16,7 +16,29 @@ dotenv.config();
 
 const app = express();
 
-app.use(cors({ origin: 'http://localhost:5173', credentials: true }));
+const allowedOrigins = [
+  process.env.API_CLIENT_ORIGIN,   // EC2 or Local depending on env file
+  "http://localhost",
+  "http://localhost:80",
+  "http://localhost:5173",
+];
+
+app.use(
+  cors({
+    origin: function (origin, callback) {
+      // Allow requests without origin (e.g., mobile apps, curl)
+      if (!origin) return callback(null, true);
+
+      if (allowedOrigins.includes(origin)) {
+        return callback(null, true);
+      } else {
+        return callback(new Error("CORS blocked: " + origin));
+      }
+    },
+    credentials: true,
+  })
+);
+
 app.use(express.json());
 app.use(cookieParser());
 
@@ -41,7 +63,7 @@ const startServer = async () => {
     await connectDB();
     
     // Then, start the Express server
-    app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+    app.listen(PORT, "0.0.0.0")
   } catch (error) {
     console.error("Failed to connect to the database", error);
     process.exit(1);

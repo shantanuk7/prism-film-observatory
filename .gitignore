@@ -1,20 +1,69 @@
-# Node.js
+# -------------------------
+# Node / JavaScript
+# -------------------------
 node_modules/
-dist/
-npm-debug.log
+**/node_modules/
+
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-lock.yaml
+.pnpmfile.cjs
+
+# -------------------------
+# Environment Files
+# NEVER commit secrets
+# -------------------------
 .env
-.env.local
+.env.*
+!.env.example       # allow committed example env file
 
-# Vite / React
-.vite/
-.vercel/
-.cache/
+# -------------------------
+# Build Artifacts
+# -------------------------
+dist/
+build/
+**/dist/
+**/build/
 
-# IDE and OS-specific files
-.DS_Store
+# -------------------------
+# Logs
+# -------------------------
+*.log
+logs/
+debug.log
 
-# For Visual Studio Code
+# -------------------------
+# IDE / Editor folders
+# -------------------------
 .vscode/
+.idea/
+*.swp
+*.swo
 
-# Thumbnails for project files
-thumbs.db
+# -------------------------
+# OS Junk
+# -------------------------
+.DS_Store
+Thumbs.db
+
+# -------------------------
+# Docker & local config
+# -------------------------
+docker-compose.override.yml
+.dockerignore
+**/.dockerignore
+
+# -------------------------
+# Local runtime data (optional)
+# -------------------------
+*.pid
+*.seed
+*.sqlite
+*.sqlite-journal
+
+# -------------------------
+# Git
+# -------------------------
+.git/
+.gitignore
